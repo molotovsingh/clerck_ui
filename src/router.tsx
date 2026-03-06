@@ -4,7 +4,6 @@ import {
   createRootRoute,
   createRoute,
   Outlet,
-  redirect,
 } from "@tanstack/react-router";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { AppShell } from "@/components/layout/app-shell";
@@ -23,6 +22,26 @@ const ClerkIntakePage = lazy(() =>
 const LawyerWorkspacePage = lazy(() =>
   import("@/features/lawyer-workspace/lawyer-workspace-page").then((m) => ({
     default: m.LawyerWorkspacePage,
+  }))
+);
+const LandingPage = lazy(() =>
+  import("@/features/landing/landing-page").then((m) => ({
+    default: m.LandingPage,
+  }))
+);
+const CaseLoomV2DashboardPage = lazy(() =>
+  import("@/features/caseloom-v2/caseloom-v2-dashboard-page").then((m) => ({
+    default: m.CaseLoomV2DashboardPage,
+  }))
+);
+const CaseLoomV2OnboardingPage = lazy(() =>
+  import("@/features/caseloom-v2/caseloom-v2-onboarding-page").then((m) => ({
+    default: m.CaseLoomV2OnboardingPage,
+  }))
+);
+const CaseLoomV2IDEPage = lazy(() =>
+  import("@/features/caseloom-v2/caseloom-v2-ide-page").then((m) => ({
+    default: m.CaseLoomV2IDEPage,
   }))
 );
 
@@ -47,9 +66,7 @@ const rootRoute = createRootRoute({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
-  beforeLoad: () => {
-    throw redirect({ to: "/clerk" });
-  },
+  component: () => <LazyRoute Component={LandingPage} />,
 });
 
 // Dev Console
@@ -106,6 +123,25 @@ const lawyerMatterRoute = createRoute({
   component: () => <LazyRoute Component={LawyerWorkspacePage} />,
 });
 
+// CaseLoom
+const caseLoomV2Route = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/caseloom-v2",
+  component: () => <LazyRoute Component={CaseLoomV2DashboardPage} />,
+});
+
+const caseLoomV2OnboardingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/caseloom-v2/onboarding",
+  component: () => <LazyRoute Component={CaseLoomV2OnboardingPage} />,
+});
+
+const caseLoomV2MatterRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/caseloom-v2/$matterId",
+  component: () => <LazyRoute Component={CaseLoomV2IDEPage} />,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   devRoute,
@@ -113,6 +149,9 @@ const routeTree = rootRoute.addChildren([
   clerkMatterRoute,
   lawyerRoute,
   lawyerMatterRoute,
+  caseLoomV2Route,
+  caseLoomV2OnboardingRoute,
+  caseLoomV2MatterRoute,
 ]);
 
 export const router = createRouter({ routeTree });

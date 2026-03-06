@@ -5,19 +5,31 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Scale,
   Terminal,
   ClipboardList,
   Briefcase,
+  Layers,
   LogOut,
   Settings,
+  Sun,
+  Moon,
+  Monitor,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { formatLabel } from "@/lib/format-label";
+import { useThemeStore, type Theme } from "@/stores/theme-store";
+import { CommandPalette } from "@/components/common/command-palette";
 
 const primarySurfaces = [
   { path: "/clerk", label: "Matters", icon: ClipboardList },
   { path: "/lawyer", label: "Lawyer Workspace", icon: Briefcase },
+  { path: "/caseloom-v2", label: "CaseLoom", icon: Layers },
 ] as const;
 
 const advancedSurfaces = [
@@ -27,6 +39,12 @@ const advancedSurfaces = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { actor, role, logout } = useAuthStore();
   const location = useLocation();
+
+  // CaseLoom IDE gets the full viewport — no shell header
+  const isFullscreenIDE = /^\/caseloom(-v2)?(\/|$)/.test(location.pathname);
+  if (isFullscreenIDE) {
+    return <main className="h-screen overflow-hidden">{children}</main>;
+  }
 
   return (
     <div className="flex h-screen flex-col">
@@ -78,6 +96,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </nav>
         </div>
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           <span className="text-sm text-muted-foreground">{actor}</span>
           {role && <Badge variant="secondary">{formatLabel(role)}</Badge>}
           <Button variant="ghost" size="icon" onClick={logout}>
@@ -86,6 +105,34 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
       <main className="flex-1 overflow-hidden">{children}</main>
+      <CommandPalette />
     </div>
+  );
+}
+
+function ThemeToggle() {
+  const { theme, setTheme } = useThemeStore();
+
+  const cycle = () => {
+    const order: Theme[] = ["system", "light", "dark"];
+    const idx = order.indexOf(theme);
+    const next = order[(idx + 1) % order.length] as Theme;
+    setTheme(next);
+  };
+
+  const Icon = theme === "dark" ? Moon : theme === "light" ? Sun : Monitor;
+  const label = theme === "system" ? "System" : theme === "light" ? "Light" : "Dark";
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button variant="ghost" size="icon" onClick={cycle} aria-label={`Theme: ${label}`}>
+          <Icon className="h-4 w-4" />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>Theme: {label}</p>
+      </TooltipContent>
+    </Tooltip>
   );
 }
