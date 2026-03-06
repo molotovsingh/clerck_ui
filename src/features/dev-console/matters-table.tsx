@@ -21,12 +21,7 @@ import { toast } from "sonner";
 import { Plus, FolderOpen } from "lucide-react";
 import { Link, useRouter } from "@tanstack/react-router";
 
-const ALLOWED_MATTER_CLASSES = [
-  { value: "general_dispute", label: "General Dispute" },
-  { value: "debt_recovery", label: "Debt Recovery" },
-  { value: "employment_dispute", label: "Employment Dispute" },
-  { value: "regulatory_enforcement", label: "Regulatory Enforcement" },
-] as const;
+import { useMatterClassOptions } from "@/hooks/use-matter-class-options";
 
 export function MattersTable() {
   const { data: matters, isLoading, error, refetch } = useMatters();
@@ -110,6 +105,7 @@ function CreateMatterForm({ onSuccess }: { onSuccess: () => void }) {
   const [clientName, setClientName] = useState("");
   const [matterClass, setMatterClass] = useState("general_dispute");
   const createMatter = useCreateMatter();
+  const matterClasses = useMatterClassOptions();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -156,7 +152,7 @@ function CreateMatterForm({ onSuccess }: { onSuccess: () => void }) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {ALLOWED_MATTER_CLASSES.map((c) => (
+            {matterClasses.map((c) => (
               <SelectItem key={c.value} value={c.value}>
                 {c.label}
               </SelectItem>
