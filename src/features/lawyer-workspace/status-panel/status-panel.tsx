@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { StatusBadge } from "@/components/common/status-badge";
+import { ConfirmDialog } from "@/components/common/confirm-dialog";
+import { toast } from "sonner";
 import { ArrowRight, AlertTriangle } from "lucide-react";
 
 interface Props {
@@ -68,22 +70,48 @@ export function StatusPanel({ matterId, matterStatus, capabilities }: Props) {
             </div>
           )}
           <div className="flex flex-wrap gap-2">
-            {nextStatuses.map((next) => (
-              <Button
-                key={next}
-                variant="outline"
-                onClick={() =>
-                  updateStatus.mutate({
-                    status: next,
-                    approval_name: approvalName || undefined,
-                  })
-                }
-                disabled={updateStatus.isPending || intakeBlocked}
-              >
-                <ArrowRight className="h-4 w-4" />
-                {formatLabel(next)}
-              </Button>
-            ))}
+            {nextStatuses.map((next) => {
+              const button = (
+                <Button
+                  key={next}
+                  variant="outline"
+                  onClick={
+                    next !== MatterStatus.FILED
+                      ? () =>
+                          updateStatus.mutate(
+                            { status: next, approval_name: approvalName || undefined },
+                            { onSuccess: () => toast.success(`Status changed to ${formatLabel(next)}`) }
+                          )
+                      : undefined
+                  }
+                  disabled={updateStatus.isPending || intakeBlocked}
+                >
+                  <ArrowRight className="h-4 w-4" />
+                  {formatLabel(next)}
+                </Button>
+              );
+
+              if (next === MatterStatus.FILED) {
+                return (
+                  <ConfirmDialog
+                    key={next}
+                    title="File This Matter"
+                    description="Mark this matter as Filed? This is a terminal state — no further status changes, edits, or transfers will be possible. This action cannot be undone."
+                    confirmLabel="File Matter"
+                    isPending={updateStatus.isPending}
+                    onConfirm={() =>
+                      updateStatus.mutate(
+                        { status: next, approval_name: approvalName || undefined },
+                        { onSuccess: () => toast.success(`Status changed to ${formatLabel(next)}`) }
+                      )
+                    }
+                    trigger={button}
+                  />
+                );
+              }
+
+              return button;
+            })}
           </div>
           {updateStatus.error && (
             <p className="text-sm text-destructive">

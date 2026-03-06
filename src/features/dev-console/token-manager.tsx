@@ -25,6 +25,8 @@ import { ErrorDisplay } from "@/components/common/error-display";
 import { EmptyState } from "@/components/common/empty-state";
 import { formatDateTime } from "@/lib/format-date";
 import { formatLabel } from "@/lib/format-label";
+import { ConfirmDialog } from "@/components/common/confirm-dialog";
+import { toast } from "sonner";
 import { Plus, Key, Trash2, Copy } from "lucide-react";
 
 export function TokenManager() {
@@ -138,14 +140,18 @@ function TokenRow({ token }: { token: { id: number; actor: string; role: Role; c
       </td>
       <td className="px-4 py-3">
         {!token.revoked_at && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => revoke.mutate(token.id)}
-            disabled={revoke.isPending}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          <ConfirmDialog
+            title="Revoke Token"
+            description={`Permanently revoke the token for "${token.actor}"? This cannot be undone, and any systems using this token will immediately lose access.`}
+            confirmLabel="Revoke"
+            isPending={revoke.isPending}
+            onConfirm={() => revoke.mutate(token.id, { onSuccess: () => toast.success("Token revoked") })}
+            trigger={
+              <Button variant="ghost" size="sm">
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            }
+          />
         )}
         {revoke.error && (
           <span className="text-xs text-destructive">Failed</span>
@@ -164,6 +170,7 @@ function CreateTokenForm({ onSuccess }: { onSuccess: (token: string) => void }) 
     e.preventDefault();
     try {
       const result = await createToken.mutateAsync({ actor, role });
+      toast.success("Token created");
       if (result.token) onSuccess(result.token);
     } catch { /* error displayed via createToken.error */ }
   };

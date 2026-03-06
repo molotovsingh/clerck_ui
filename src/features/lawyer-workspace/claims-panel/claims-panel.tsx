@@ -16,16 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import { LoadingSpinner } from "@/components/common/loading";
 import { EmptyState } from "@/components/common/empty-state";
+import { FormDialog } from "@/components/common/form-dialog";
+import { toast } from "sonner";
 import { Plus, Quote } from "lucide-react";
 import { formatRelative } from "@/lib/format-date";
 
@@ -36,7 +30,6 @@ interface Props {
 
 export function ClaimsPanel({ matterId, capabilities }: Props) {
   const { data: claims, isLoading } = useClaims(matterId);
-  const [open, setOpen] = useState(false);
 
   if (isLoading) return <LoadingSpinner />;
 
@@ -47,24 +40,20 @@ export function ClaimsPanel({ matterId, capabilities }: Props) {
           Claims {claims && `(${claims.length})`}
         </h3>
         {canPerform(capabilities, "claim_write") && (
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
+          <FormDialog
+            title="Create Claim"
+            description="Add a new claim to this matter"
+            trigger={
               <Button variant="outline" size="sm">
                 <Plus className="h-3 w-3" />
                 Add
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create Claim</DialogTitle>
-                <DialogDescription>Add a new claim to this matter</DialogDescription>
-              </DialogHeader>
-              <CreateClaimForm
-                matterId={matterId}
-                onSuccess={() => setOpen(false)}
-              />
-            </DialogContent>
-          </Dialog>
+            }
+          >
+            {(close) => (
+              <CreateClaimForm matterId={matterId} onSuccess={close} />
+            )}
+          </FormDialog>
         )}
       </div>
 
@@ -126,6 +115,7 @@ function CreateClaimForm({
           ? sourceRefs.split(",").map((s) => s.trim())
           : [],
       });
+      toast.success("Claim added");
       onSuccess();
     } catch { /* error displayed via create.error */ }
   };

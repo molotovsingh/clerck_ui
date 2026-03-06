@@ -13,17 +13,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import { StatusBadge } from "@/components/common/status-badge";
 import { LoadingSpinner } from "@/components/common/loading";
 import { EmptyState } from "@/components/common/empty-state";
+import { FormDialog } from "@/components/common/form-dialog";
+import { toast } from "sonner";
 import { Plus, Layers } from "lucide-react";
 import { formatRelative } from "@/lib/format-date";
 
@@ -34,7 +28,6 @@ interface Props {
 
 export function JobsPanel({ matterId, capabilities }: Props) {
   const { data: jobs, isLoading } = useJobs(matterId);
-  const [open, setOpen] = useState(false);
 
   if (isLoading) return <LoadingSpinner />;
 
@@ -45,24 +38,20 @@ export function JobsPanel({ matterId, capabilities }: Props) {
           Processing {jobs && `(${jobs.length})`}
         </h3>
         {canPerform(capabilities, "queue_jobs") && (
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
+          <FormDialog
+            title="Start Task"
+            description="Start a new processing task"
+            trigger={
               <Button variant="outline" size="sm">
                 <Plus className="h-3 w-3" />
                 Start Task
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Start Task</DialogTitle>
-                <DialogDescription>Start a new processing task</DialogDescription>
-              </DialogHeader>
-              <QueueJobForm
-                matterId={matterId}
-                onSuccess={() => setOpen(false)}
-              />
-            </DialogContent>
-          </Dialog>
+            }
+          >
+            {(close) => (
+              <QueueJobForm matterId={matterId} onSuccess={close} />
+            )}
+          </FormDialog>
         )}
       </div>
 
@@ -112,6 +101,7 @@ function QueueJobForm({
     e.preventDefault();
     try {
       await queue.mutateAsync({ job_type: jobType });
+      toast.success("Task started");
       onSuccess();
     } catch { /* error displayed via queue.error */ }
   };

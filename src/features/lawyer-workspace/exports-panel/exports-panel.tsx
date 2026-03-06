@@ -15,17 +15,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { LoadingSpinner } from "@/components/common/loading";
 import { EmptyState } from "@/components/common/empty-state";
+import { FormDialog } from "@/components/common/form-dialog";
+import { toast } from "sonner";
 import { Plus, Package, Download } from "lucide-react";
 import { formatDateTime } from "@/lib/format-date";
 
@@ -36,7 +30,6 @@ interface Props {
 
 export function ExportsPanel({ matterId, capabilities }: Props) {
   const { data: artifacts, isLoading } = useArtifacts(matterId);
-  const [open, setOpen] = useState(false);
 
   if (isLoading) return <LoadingSpinner />;
 
@@ -45,24 +38,20 @@ export function ExportsPanel({ matterId, capabilities }: Props) {
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold">Exports</h3>
         {canPerform(capabilities, "export") && (
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
+          <FormDialog
+            title="Create Export"
+            description="Generate an export package"
+            trigger={
               <Button variant="outline" size="sm">
                 <Plus className="h-3 w-3" />
                 Export
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create Export</DialogTitle>
-                <DialogDescription>Generate an export package</DialogDescription>
-              </DialogHeader>
-              <CreateExportForm
-                matterId={matterId}
-                onSuccess={() => setOpen(false)}
-              />
-            </DialogContent>
-          </Dialog>
+            }
+          >
+            {(close) => (
+              <CreateExportForm matterId={matterId} onSuccess={close} />
+            )}
+          </FormDialog>
         )}
       </div>
 
@@ -115,6 +104,7 @@ function CreateExportForm({
         kind,
         approved_by: approvedBy || undefined,
       });
+      toast.success("Export created");
       onSuccess();
     } catch { /* error displayed via create.error */ }
   };

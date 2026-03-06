@@ -1,0 +1,44 @@
+INVOICE #2024-0847
+
+From:   Apex Digital Solutions Ltd
+        42 Commerce Street, Suite 300
+        Melbourne VIC 3000
+        ABN: 51 234 567 890
+
+To:     GreenField Property Group Pty Ltd
+        18 Harbour Road
+        Sydney NSW 2000
+        ABN: 73 456 789 012
+
+Date:       15 August 2024
+Due Date:   14 September 2024
+Terms:      Net 30
+
+Description                                          Amount (AUD)
+-------------------------------------------------------------------
+Website redesign and migration (Phase 2)              $28,500.00
+  - UX audit and wireframes
+  - Frontend development (React)
+  - CMS integration and data migration
+  - QA testing and deployment
+
+API integration — property listing feed                $8,200.00
+  - REA Group XML feed connector
+  - Domain.com.au API integration
+  - Automated sync scheduling
+
+Hosting setup and 12-month prepaid plan                $3,600.00
+
+-------------------------------------------------------------------
+Subtotal                                              $40,300.00
+GST (10%)                                              $4,030.00
+-------------------------------------------------------------------
+TOTAL DUE                                             $44,330.00
+
+Payment Details:
+  BSB: 062-000
+  Account: 1234 5678
+  Reference: INV-2024-0847
+
+OVERDUE NOTICE: This invoice is now 147 days past due.
+A formal demand will follow if payment is not received within 14 days.

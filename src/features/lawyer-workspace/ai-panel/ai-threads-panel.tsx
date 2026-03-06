@@ -11,16 +11,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import { LoadingSpinner } from "@/components/common/loading";
 import { EmptyState } from "@/components/common/empty-state";
+import { FormDialog } from "@/components/common/form-dialog";
+import { toast } from "sonner";
 import { Plus, MessageCircle, ArrowLeft, Send, Info } from "lucide-react";
 import { formatRelative } from "@/lib/format-date";
 import { formatLabel } from "@/lib/format-label";
@@ -61,30 +55,25 @@ function ThreadListView({
   onSelectThread: (id: string) => void;
 }) {
   const { data: threads, isLoading } = useAiThreads(matterId);
-  const [open, setOpen] = useState(false);
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold">AI Notes</h3>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
+        <FormDialog
+          title="Start a Discussion"
+          description="Start a discussion to coordinate with collaborators"
+          trigger={
             <Button variant="outline" size="sm">
               <Plus className="h-3 w-3" />
               New
             </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Start a Discussion</DialogTitle>
-              <DialogDescription>Start a discussion to coordinate with collaborators</DialogDescription>
-            </DialogHeader>
-            <CreateThreadForm
-              matterId={matterId}
-              onSuccess={() => setOpen(false)}
-            />
-          </DialogContent>
-        </Dialog>
+          }
+        >
+          {(close) => (
+            <CreateThreadForm matterId={matterId} onSuccess={close} />
+          )}
+        </FormDialog>
       </div>
 
       <div className="rounded border border-blue-200 bg-blue-50 p-2 text-xs text-blue-800">
@@ -253,6 +242,7 @@ function CreateThreadForm({
     e.preventDefault();
     try {
       await create.mutateAsync({ title });
+      toast.success("Discussion started");
       onSuccess();
     } catch { /* error displayed via create.error */ }
   };

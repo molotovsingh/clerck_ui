@@ -15,17 +15,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import { StatusBadge } from "@/components/common/status-badge";
 import { LoadingSpinner } from "@/components/common/loading";
 import { EmptyState } from "@/components/common/empty-state";
+import { FormDialog } from "@/components/common/form-dialog";
+import { ConfirmDialog } from "@/components/common/confirm-dialog";
+import { toast } from "sonner";
 import { Plus, ArrowRightLeft, Check, X } from "lucide-react";
 import { formatRelative } from "@/lib/format-date";
 
@@ -37,7 +32,6 @@ interface Props {
 export function HandoffPanel({ matterId, capabilities }: Props) {
   const { data: handoffs, isLoading } = useHandoffs(matterId);
   const { data: active } = useActiveHandoff(matterId);
-  const [open, setOpen] = useState(false);
 
   if (isLoading) return <LoadingSpinner />;
 
@@ -60,26 +54,20 @@ export function HandoffPanel({ matterId, capabilities }: Props) {
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold">Transfers</h3>
         {canPerform(capabilities, "handoff_write") && (
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
+          <FormDialog
+            title="Transfer Editing Access"
+            description="Transfer editing access to another user"
+            trigger={
               <Button variant="outline" size="sm">
                 <Plus className="h-3 w-3" />
                 New
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Transfer Editing Access</DialogTitle>
-                <DialogDescription>
-                  Transfer editing access to another user
-                </DialogDescription>
-              </DialogHeader>
-              <CreateHandoffForm
-                matterId={matterId}
-                onSuccess={() => setOpen(false)}
-              />
-            </DialogContent>
-          </Dialog>
+            }
+          >
+            {(close) => (
+              <CreateHandoffForm matterId={matterId} onSuccess={close} />
+            )}
+          </FormDialog>
         )}
       </div>
 
@@ -128,25 +116,38 @@ function HandoffRow({
             variant="outline"
             className="text-green-600"
             onClick={() =>
-              resolve.mutate({ status: HandoffStatus.ACCEPTED })
+              resolve.mutate(
+                { status: HandoffStatus.ACCEPTED },
+                { onSuccess: () => toast.success("Transfer accepted") }
+              )
             }
             disabled={resolve.isPending}
           >
             <Check className="h-3 w-3" />
             Accept
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="text-red-600"
-            onClick={() =>
-              resolve.mutate({ status: HandoffStatus.DECLINED })
+          <ConfirmDialog
+            title="Decline Transfer"
+            description={`Decline the transfer from "${handoff.requested_by}" to "${handoff.target_actor}"? The requester will be notified.`}
+            confirmLabel="Decline Transfer"
+            isPending={resolve.isPending}
+            onConfirm={() =>
+              resolve.mutate(
+                { status: HandoffStatus.DECLINED },
+                { onSuccess: () => toast.success("Transfer declined") }
+              )
             }
-            disabled={resolve.isPending}
-          >
-            <X className="h-3 w-3" />
-            Decline
-          </Button>
+            trigger={
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-red-600"
+              >
+                <X className="h-3 w-3" />
+                Decline
+              </Button>
+            }
+          />
         </div>
       )}
       {resolve.error && (
@@ -174,6 +175,7 @@ function CreateHandoffForm({
         target_actor: targetActor,
         note: note || undefined,
       });
+      toast.success("Transfer requested");
       onSuccess();
     } catch { /* error displayed via create.error */ }
   };

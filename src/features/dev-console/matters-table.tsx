@@ -4,19 +4,10 @@ import { StatusBadge } from "@/components/common/status-badge";
 import { LoadingSpinner } from "@/components/common/loading";
 import { ErrorDisplay } from "@/components/common/error-display";
 import { EmptyState } from "@/components/common/empty-state";
+import { FormDialog } from "@/components/common/form-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { formatDateTime } from "@/lib/format-date";
-import { formatLabel } from "@/lib/format-label";
 import {
   Select,
   SelectContent,
@@ -24,6 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { formatDateTime } from "@/lib/format-date";
+import { formatLabel } from "@/lib/format-label";
+import { toast } from "sonner";
 import { Plus, FolderOpen } from "lucide-react";
 import { Link, useRouter } from "@tanstack/react-router";
 
@@ -36,7 +30,6 @@ const ALLOWED_MATTER_CLASSES = [
 
 export function MattersTable() {
   const { data: matters, isLoading, error, refetch } = useMatters();
-  const [open, setOpen] = useState(false);
 
   if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorDisplay error={error} onRetry={refetch} />;
@@ -47,21 +40,18 @@ export function MattersTable() {
         <h2 className="text-lg font-semibold">
           Matters {matters && `(${matters.length})`}
         </h2>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
+        <FormDialog
+          title="Create Matter"
+          description="Create a new litigation matter"
+          trigger={
             <Button size="sm">
               <Plus className="h-4 w-4" />
               New Matter
             </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create Matter</DialogTitle>
-              <DialogDescription>Create a new litigation matter</DialogDescription>
-            </DialogHeader>
-            <CreateMatterForm onSuccess={() => setOpen(false)} />
-          </DialogContent>
-        </Dialog>
+          }
+        >
+          {(close) => <CreateMatterForm onSuccess={close} />}
+        </FormDialog>
       </div>
 
       {!matters?.length ? (
@@ -130,6 +120,7 @@ function CreateMatterForm({ onSuccess }: { onSuccess: () => void }) {
         client_name: clientName,
         matter_class: matterClass,
       });
+      toast.success("Matter created");
       onSuccess();
       router.navigate({
         to: "/clerk/$matterId",

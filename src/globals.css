@@ -39,6 +39,67 @@
   --radius-xl: 0.75rem;
 }
 
+.dark {
+  --color-background: oklch(0.145 0 0);
+  --color-foreground: oklch(0.985 0 0);
+  --color-card: oklch(0.17 0 0);
+  --color-card-foreground: oklch(0.985 0 0);
+  --color-popover: oklch(0.17 0 0);
+  --color-popover-foreground: oklch(0.985 0 0);
+  --color-primary: oklch(0.708 0.165 254.624);
+  --color-primary-foreground: oklch(0.985 0 0);
+  --color-secondary: oklch(0.215 0 0);
+  --color-secondary-foreground: oklch(0.985 0 0);
+  --color-muted: oklch(0.215 0 0);
+  --color-muted-foreground: oklch(0.708 0 0);
+  --color-accent: oklch(0.215 0 0);
+  --color-accent-foreground: oklch(0.985 0 0);
+  --color-destructive: oklch(0.577 0.245 27.325);
+  --color-destructive-foreground: oklch(0.577 0.245 27.325);
+  --color-border: oklch(0.3 0 0);
+  --color-input: oklch(0.3 0 0);
+  --color-ring: oklch(0.708 0.165 254.624);
+  --color-chart-1: oklch(0.646 0.222 41.116);
+  --color-chart-2: oklch(0.6 0.118 184.704);
+  --color-chart-3: oklch(0.398 0.07 227.392);
+  --color-chart-4: oklch(0.828 0.189 84.429);
+  --color-chart-5: oklch(0.769 0.188 70.08);
+  --color-sidebar: oklch(0.17 0 0);
+  --color-sidebar-foreground: oklch(0.985 0 0);
+  --color-sidebar-primary: oklch(0.708 0.165 254.624);
+  --color-sidebar-primary-foreground: oklch(0.985 0 0);
+  --color-sidebar-accent: oklch(0.215 0 0);
+  --color-sidebar-accent-foreground: oklch(0.985 0 0);
+  --color-sidebar-border: oklch(0.3 0 0);
+  --color-sidebar-ring: oklch(0.708 0.165 254.624);
+}
+
+[data-theme="caseloom"] {
+  --cl-bg: #0E1117;
+  --cl-sidebar: #11141C;
+  --cl-panel: #0B0D13;
+  --cl-surface: #161A24;
+  --cl-border: #1E2230;
+  --cl-border-hi: #2A2F45;
+  --cl-text: #C8C9D0;
+  --cl-bright: #EDEAE2;
+  --cl-muted: #636578;
+  --cl-dim: #383B4F;
+  --cl-gold: #C9A66B;
+  --cl-gold-dk: #8C6A35;
+  --cl-red: #E8706A;
+  --cl-green: #5CB87A;
+  --cl-blue: #6A9FE8;
+  --cl-purple: #9B7ED8;
+  --cl-teal: #5CC4B8;
+  --cl-act-bar: #0A0C12;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @layer base {
   *,
   ::after,

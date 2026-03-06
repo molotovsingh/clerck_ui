@@ -15,16 +15,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import { LoadingSpinner } from "@/components/common/loading";
 import { EmptyState } from "@/components/common/empty-state";
+import { FormDialog } from "@/components/common/form-dialog";
+import { ConfirmDialog } from "@/components/common/confirm-dialog";
+import { toast } from "sonner";
 import { Plus, Users, Trash2 } from "lucide-react";
 
 interface Props {
@@ -35,7 +30,6 @@ interface Props {
 export function AccessPanel({ matterId, capabilities }: Props) {
   const { data: accessList, isLoading } = useAccessList(matterId);
   const revoke = useRevokeAccess(matterId);
-  const [open, setOpen] = useState(false);
 
   if (isLoading) return <LoadingSpinner />;
 
@@ -44,26 +38,20 @@ export function AccessPanel({ matterId, capabilities }: Props) {
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold">Access Control</h3>
         {canPerform(capabilities, "manage_access") && (
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
+          <FormDialog
+            title="Grant Access"
+            description="Add a collaborator to this matter"
+            trigger={
               <Button variant="outline" size="sm">
                 <Plus className="h-3 w-3" />
                 Grant
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Grant Access</DialogTitle>
-                <DialogDescription>
-                  Add a collaborator to this matter
-                </DialogDescription>
-              </DialogHeader>
-              <GrantAccessForm
-                matterId={matterId}
-                onSuccess={() => setOpen(false)}
-              />
-            </DialogContent>
-          </Dialog>
+            }
+          >
+            {(close) => (
+              <GrantAccessForm matterId={matterId} onSuccess={close} />
+            )}
+          </FormDialog>
         )}
       </div>
 
@@ -81,15 +69,22 @@ export function AccessPanel({ matterId, capabilities }: Props) {
                 <Badge variant="secondary">{formatLabel(a.role)}</Badge>
               </div>
               {canPerform(capabilities, "manage_access") && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 text-destructive"
-                  onClick={() => revoke.mutate(a.actor)}
-                  disabled={revoke.isPending}
-                >
-                  <Trash2 className="h-3 w-3" />
-                </Button>
+                <ConfirmDialog
+                  title="Revoke Access"
+                  description={`Remove "${a.actor}" from this matter? They will immediately lose all access and any unsaved work may be lost.`}
+                  confirmLabel="Revoke Access"
+                  isPending={revoke.isPending}
+                  onConfirm={() => revoke.mutate(a.actor, { onSuccess: () => toast.success("Access revoked") })}
+                  trigger={
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-destructive"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  }
+                />
               )}
             </div>
           ))}
@@ -119,6 +114,7 @@ function GrantAccessForm({
     e.preventDefault();
     try {
       await grant.mutateAsync({ actor, role });
+      toast.success("Access granted");
       onSuccess();
     } catch { /* error displayed via grant.error */ }
   };

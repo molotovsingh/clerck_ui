@@ -1,0 +1,57 @@
+SERVICE AGREEMENT
+
+Date: 1 March 2024
+
+BETWEEN:
+  Apex Digital Solutions Ltd (ABN 51 234 567 890)
+  ("the Provider")
+
+AND:
+  GreenField Property Group Pty Ltd (ABN 73 456 789 012)
+  ("the Client")
+
+1. SCOPE OF WORK
+
+The Provider agrees to deliver the following services:
+
+  Phase 1 — Discovery & Design (completed, paid)
+    - Stakeholder interviews and requirements gathering
+    - UX research and competitor analysis
+    - Wireframes and design system
+
+  Phase 2 — Build & Launch
+    - Frontend development (React-based SPA)
+    - CMS integration (WordPress headless)
+    - Property listing feed integrations (REA Group, Domain)
+    - QA testing, UAT support, and production deployment
+    - 12-month hosting on AWS (prepaid)
+
+2. PAYMENT TERMS
+
+  Phase 1: $18,000 + GST — due on signing (PAID 5 March 2024)
+  Phase 2: $40,300 + GST — due within 30 days of delivery
+
+3. DELIVERY
+
+  Phase 2 deliverables were accepted by the Client on 12 August 2024
+  via email confirmation from James Whitfield (Head of Digital, GreenField).
+
+  Acceptance email stated: "All looks good, we're happy to go live.
+  Please proceed with the DNS cutover."
+
+4. DISPUTE RESOLUTION
+
+  The parties agree to attempt resolution through direct negotiation.
+  If unresolved within 30 days, the matter may be referred to mediation
+  under the Resolution Institute Mediation Rules.
+  Governing law: New South Wales, Australia.
+
+5. LATE PAYMENT
+
+  Overdue invoices accrue interest at 2% per month on the outstanding balance.
+  The Provider reserves the right to suspend services and hosting if payment
+  remains outstanding beyond 60 days.
+
+Signed:
+  Sarah Chen, Director — Apex Digital Solutions Ltd
+  James Whitfield, Head of Digital — GreenField Property Group Pty Ltd
