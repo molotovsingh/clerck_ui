@@ -81,14 +81,9 @@ export function MattersTable() {
                     {formatDateTime(m.created_at)}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex gap-1">
-                      <Link to="/clerk/$matterId" params={{ matterId: m.public_id }}>
-                        <Button variant="ghost" size="sm">Intake</Button>
-                      </Link>
-                      <Link to="/lawyer/$matterId" params={{ matterId: m.public_id }}>
-                        <Button variant="ghost" size="sm">Workspace</Button>
-                      </Link>
-                    </div>
+                    <Link to="/$matterId" params={{ matterId: m.public_id }}>
+                      <Button variant="ghost" size="sm">Open</Button>
+                    </Link>
                   </td>
                 </tr>
               ))}
@@ -119,7 +114,7 @@ function CreateMatterForm({ onSuccess }: { onSuccess: () => void }) {
       toast.success("Matter created");
       onSuccess();
       router.navigate({
-        to: "/clerk/$matterId",
+        to: "/$matterId",
         params: { matterId: result.public_id },
       });
     } catch { /* error displayed via createMatter.error */ }

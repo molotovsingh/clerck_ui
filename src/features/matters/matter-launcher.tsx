@@ -240,7 +240,7 @@ function MatterList() {
           {filtered.map((m) => (
             <Link
               key={m.public_id}
-              to="/lawyer/$matterId"
+              to="/$matterId"
               params={{ matterId: m.public_id }}
               className="group block rounded-lg border p-4 hover:border-primary/30 hover:bg-muted/50 transition-colors"
             >

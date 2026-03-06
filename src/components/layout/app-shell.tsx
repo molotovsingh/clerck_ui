@@ -1,5 +1,6 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { useAuthStore } from "@/stores/auth-store";
+import { useWorkspaceStore } from "@/stores/workspace-store";
 import { Role } from "@/types/enums";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,10 +27,9 @@ import { CommandPalette } from "@/components/common/command-palette";
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { actor, role, logout } = useAuthStore();
   const location = useLocation();
+  const fullscreen = useWorkspaceStore((s) => s.fullscreen);
 
-  // CaseLoom IDE still uses fullscreen until Phase 3 migrates it to store-driven
-  const isFullscreenIDE = /^\/caseloom(-v2)?(\/|$)/.test(location.pathname);
-  if (isFullscreenIDE) {
+  if (fullscreen) {
     return <main className="h-screen overflow-hidden">{children}</main>;
   }
 

@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { WorkspaceStatusLine } from "./workspace-status-line";
 import { WorkspaceJobsIndicator } from "./workspace-jobs-indicator";
-import { ArrowLeft, AlertCircle, Settings, Eye, PenTool } from "lucide-react";
+import { ArrowLeft, AlertCircle, Settings, Eye, PenTool, Monitor } from "lucide-react";
+import { canPerform } from "@/lib/capability-check";
 import { cn } from "@/lib/cn";
 
 interface Props {
@@ -37,7 +38,7 @@ export function WorkspaceHeader({
         {/* Left: nav + matter info */}
         <div className="flex items-center gap-3">
           <Link
-            to="/lawyer"
+            to="/"
             className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
@@ -84,6 +85,14 @@ export function WorkspaceHeader({
           icon={<PenTool className="h-3.5 w-3.5" />}
           label="Draft"
         />
+        {canPerform(capabilities, "draft_read") && (
+          <ModeButton
+            active={mode === "ide"}
+            onClick={() => setMode("ide")}
+            icon={<Monitor className="h-3.5 w-3.5" />}
+            label="IDE"
+          />
+        )}
       </div>
     </div>
   );

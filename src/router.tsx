@@ -20,19 +20,9 @@ const DevConsolePage = lazy(() =>
     default: m.DevConsolePage,
   }))
 );
-const ClerkIntakePage = lazy(() =>
-  import("@/features/clerk-intake/clerk-intake-page").then((m) => ({
-    default: m.ClerkIntakePage,
-  }))
-);
-const LawyerWorkspacePage = lazy(() =>
-  import("@/features/lawyer-workspace/lawyer-workspace-page").then((m) => ({
-    default: m.LawyerWorkspacePage,
-  }))
-);
-const CaseLoomV2IDEPage = lazy(() =>
-  import("@/features/caseloom-v2/caseloom-v2-ide-page").then((m) => ({
-    default: m.CaseLoomV2IDEPage,
+const WorkspacePage = lazy(() =>
+  import("@/features/workspace/workspace-page").then((m) => ({
+    default: m.WorkspacePage,
   }))
 );
 
@@ -68,26 +58,13 @@ const devRoute = createRoute({
   component: () => <LazyRoute Component={DevConsolePage} />,
 });
 
-// Matter detail routes — temporary, will collapse into /$matterId in Phase 3
-const clerkMatterRoute = createRoute({
+const matterRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/clerk/$matterId",
-  component: () => <LazyRoute Component={ClerkIntakePage} />,
+  path: "/$matterId",
+  component: () => <LazyRoute Component={WorkspacePage} />,
 });
 
-const lawyerMatterRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/lawyer/$matterId",
-  component: () => <LazyRoute Component={LawyerWorkspacePage} />,
-});
-
-const caseLoomV2MatterRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/caseloom-v2/$matterId",
-  component: () => <LazyRoute Component={CaseLoomV2IDEPage} />,
-});
-
-// --- Redirects from old landing routes ---
+// --- Redirects from old routes ---
 
 const clerkRedirect = createRoute({
   getParentRoute: () => rootRoute,
@@ -97,11 +74,27 @@ const clerkRedirect = createRoute({
   },
 });
 
+const clerkMatterRedirect = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/clerk/$matterId",
+  beforeLoad: ({ params }) => {
+    throw redirect({ to: "/$matterId", params: { matterId: params.matterId } });
+  },
+});
+
 const lawyerRedirect = createRoute({
   getParentRoute: () => rootRoute,
   path: "/lawyer",
   beforeLoad: () => {
     throw redirect({ to: "/" });
+  },
+});
+
+const lawyerMatterRedirect = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/lawyer/$matterId",
+  beforeLoad: ({ params }) => {
+    throw redirect({ to: "/$matterId", params: { matterId: params.matterId } });
   },
 });
 
@@ -121,16 +114,25 @@ const caseLoomV2OnboardingRedirect = createRoute({
   },
 });
 
+const caseLoomV2MatterRedirect = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/caseloom-v2/$matterId",
+  beforeLoad: ({ params }) => {
+    throw redirect({ to: "/$matterId", params: { matterId: params.matterId } });
+  },
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   devRoute,
-  clerkMatterRoute,
-  lawyerMatterRoute,
-  caseLoomV2MatterRoute,
+  matterRoute,
   clerkRedirect,
+  clerkMatterRedirect,
   lawyerRedirect,
+  lawyerMatterRedirect,
   caseLoomV2Redirect,
   caseLoomV2OnboardingRedirect,
+  caseLoomV2MatterRedirect,
 ]);
 
 export const router = createRouter({ routeTree });
