@@ -7,7 +7,10 @@ export interface MatterClassOption {
   label: string;
 }
 
-const FALLBACK_CLASSES: MatterClassOption[] = [
+// Bootstrap defaults for matter creation (no matterId available yet).
+// TODO: Replace with a global /api/v1/compliance/defaults endpoint when available.
+// These values mirror the backend's default allowed_matter_classes and must stay in sync.
+const BOOTSTRAP_DEFAULTS: MatterClassOption[] = [
   { value: "general_dispute", label: "General Dispute" },
   { value: "debt_recovery", label: "Debt Recovery" },
   { value: "employment_dispute", label: "Employment Dispute" },
@@ -16,7 +19,8 @@ const FALLBACK_CLASSES: MatterClassOption[] = [
 
 /**
  * Fetches allowed matter classes from the backend compliance endpoint.
- * Falls back to a static list if no matterId is provided or the request fails.
+ * When no matterId is available (e.g., the create-matter form), returns
+ * static bootstrap defaults until a global endpoint is added.
  */
 export function useMatterClassOptions(matterId?: string): MatterClassOption[] {
   const { data } = useQuery({
@@ -33,5 +37,5 @@ export function useMatterClassOptions(matterId?: string): MatterClassOption[] {
     }));
   }
 
-  return FALLBACK_CLASSES;
+  return BOOTSTRAP_DEFAULTS;
 }

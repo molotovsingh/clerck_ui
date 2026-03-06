@@ -87,7 +87,7 @@ function InlineCreateMatter() {
       setClientName("");
       setExpanded(false);
       router.navigate({
-        to: "/lawyer/$matterId",
+        to: "/$matterId",
         params: { matterId: result.public_id },
       });
     } catch {
