@@ -16,22 +16,16 @@ import { ArrowRight, AlertTriangle } from "lucide-react";
 interface Props {
   matterId: string;
   matterStatus: MatterStatus;
+  allowedTransitions: MatterStatus[];
   capabilities?: MatterCapabilities;
 }
 
-const statusTransitions: Record<MatterStatus, MatterStatus[]> = {
-  [MatterStatus.INTAKE]: [MatterStatus.UNDER_REVIEW],
-  [MatterStatus.UNDER_REVIEW]: [MatterStatus.CLIENT_APPROVED],
-  [MatterStatus.CLIENT_APPROVED]: [MatterStatus.FILED],
-  [MatterStatus.FILED]: [],
-};
-
-export function StatusPanel({ matterId, matterStatus, capabilities }: Props) {
+export function StatusPanel({ matterId, matterStatus, allowedTransitions, capabilities }: Props) {
   const updateStatus = useUpdateMatterStatus(matterId);
   const { data: intakeCtx } = useIntakeContext(matterId);
   const [approvalName, setApprovalName] = useState("");
   const canUpdate = canPerform(capabilities, "status_write");
-  const nextStatuses = statusTransitions[matterStatus] ?? [];
+  const nextStatuses = allowedTransitions;
 
   // Block INTAKE → UNDER_REVIEW unless intake gate has passed
   const intakeBlocked =

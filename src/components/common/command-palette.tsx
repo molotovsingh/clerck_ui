@@ -53,7 +53,7 @@ export function CommandPalette() {
                 key={m.public_id}
                 value={`${m.name} ${m.client_name}`}
                 onSelect={() =>
-                  navigate("/lawyer/$matterId", { matterId: m.public_id })
+                  navigate("/matters/$matterId", { matterId: m.public_id })
                 }
               >
                 <Scale className="h-4 w-4 text-muted-foreground" />
@@ -74,14 +74,14 @@ export function CommandPalette() {
         <CommandGroup heading="Navigation">
           <CommandItem
             value="Go to Matters"
-            onSelect={() => navigate("/clerk")}
+            onSelect={() => navigate("/matters")}
           >
             <ClipboardList className="h-4 w-4" />
             <span>Matters</span>
           </CommandItem>
           <CommandItem
             value="Go to Lawyer Workspace"
-            onSelect={() => navigate("/lawyer")}
+            onSelect={() => navigate("/matters")}
           >
             <Briefcase className="h-4 w-4" />
             <span>Lawyer Workspace</span>
@@ -100,7 +100,7 @@ export function CommandPalette() {
         <CommandGroup heading="Actions">
           <CommandItem
             value="Create New Matter"
-            onSelect={() => navigate("/clerk")}
+            onSelect={() => navigate("/matters")}
           >
             <Plus className="h-4 w-4" />
             <span>Create New Matter</span>

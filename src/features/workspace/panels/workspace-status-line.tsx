@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useMatterReadiness } from "@/hooks/use-matters";
-import { useRequiredV1Drafts } from "@/hooks/use-drafts";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useWorkspaceStore } from "@/stores/workspace-store";
@@ -14,17 +13,6 @@ import {
 } from "lucide-react";
 import { formatLabel } from "@/lib/format-label";
 
-const CHECK_LABELS: Record<string, string> = {
-  intake_gate: "Case details complete",
-  status_for_client_approval: "Ready for client review",
-  intake_manifest: "Evidence uploaded",
-  claim_source_refs: "Claims linked to evidence",
-  approved_draft: "At least one document approved",
-  required_v1_drafts_approved: "All required documents approved",
-  status_for_court_bundle: "Ready for court filing",
-  approval_metadata: "Client approval recorded",
-};
-
 interface Props {
   matterId: string;
 }
@@ -32,13 +20,11 @@ interface Props {
 export function WorkspaceStatusLine({ matterId }: Props) {
   const [expanded, setExpanded] = useState(false);
   const { data: readiness } = useMatterReadiness(matterId);
-  const { data: requiredV1 } = useRequiredV1Drafts(matterId);
   const setFilingWizardOpen = useWorkspaceStore((s) => s.setFilingWizardOpen);
 
   if (!readiness) return null;
 
-  const passedCount = readiness.checks.filter((c) => c.ok).length;
-  const totalCount = readiness.checks.length;
+  const { passed_count, total_count, required_v1_coverage } = readiness;
   const failedChecks = readiness.checks.filter((c) => !c.ok);
   const allPassed = failedChecks.length === 0;
   const readyToFile = readiness.ready_for_court_bundle;
@@ -74,7 +60,7 @@ export function WorkspaceStatusLine({ matterId }: Props) {
         <div className="absolute right-0 top-full z-50 mt-1 w-80 rounded-lg border bg-popover p-3 shadow-lg">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-medium text-muted-foreground">
-              {passedCount}/{totalCount} requirements met
+              {passed_count}/{total_count} requirements met
             </span>
             {readiness.intake_gate_passed && (
               <Badge className="bg-green-100 text-green-800 border-green-200 text-xs">
@@ -95,24 +81,24 @@ export function WorkspaceStatusLine({ matterId }: Props) {
                   <XCircle className="h-3.5 w-3.5 text-red-400 shrink-0" />
                 )}
                 <span className="flex-1">
-                  {CHECK_LABELS[check.key] ?? check.key}
+                  {check.label}
                 </span>
               </div>
             ))}
           </div>
 
-          {requiredV1 && (
+          {required_v1_coverage && (
             <div className="mt-3 border-t pt-2">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-xs font-medium text-muted-foreground">
                   Required Documents
                 </span>
                 <Badge variant="secondary" className="text-xs">
-                  {requiredV1.required.filter((d) => d.exists).length}/{requiredV1.required.length}
+                  {required_v1_coverage.required.filter((d) => d.exists).length}/{required_v1_coverage.required.length}
                 </Badge>
               </div>
               <div className="space-y-0.5">
-                {requiredV1.required.map((item) => (
+                {required_v1_coverage.required.map((item) => (
                   <div
                     key={item.doc_type}
                     className="flex items-center gap-2 px-1.5 py-0.5 text-xs"

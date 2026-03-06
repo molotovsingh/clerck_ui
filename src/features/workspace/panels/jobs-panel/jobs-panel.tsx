@@ -1,23 +1,14 @@
-import { useState } from "react";
-import { useJobs, useQueueJob } from "@/hooks/use-jobs";
-import { JobType, JobStatus } from "@/types/enums";
+import { useJobs } from "@/hooks/use-jobs";
+import { JobStatus } from "@/types/enums";
 import type { MatterCapabilities } from "@/types/access";
 import { canPerform } from "@/lib/capability-check";
 import { formatLabel } from "@/lib/format-label";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { StatusBadge } from "@/components/common/status-badge";
 import { LoadingSpinner } from "@/components/common/loading";
 import { EmptyState } from "@/components/common/empty-state";
 import { FormDialog } from "@/components/common/form-dialog";
-import { toast } from "sonner";
+import { QueueJobForm } from "./queue-job-form";
 import { Plus, Layers } from "lucide-react";
 import { formatRelative } from "@/lib/format-date";
 
@@ -84,51 +75,5 @@ export function JobsPanel({ matterId, capabilities }: Props) {
         </div>
       )}
     </div>
-  );
-}
-
-function QueueJobForm({
-  matterId,
-  onSuccess,
-}: {
-  matterId: string;
-  onSuccess: () => void;
-}) {
-  const [jobType, setJobType] = useState<JobType>(JobType.OCR);
-  const queue = useQueueJob(matterId);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await queue.mutateAsync({ job_type: jobType });
-      toast.success("Task started");
-      onSuccess();
-    } catch { /* error displayed via queue.error */ }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label>Task Type</Label>
-        <Select value={jobType} onValueChange={(v) => setJobType(v as JobType)}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.values(JobType).map((t) => (
-              <SelectItem key={t} value={t}>
-                {formatLabel(t)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      {queue.error && (
-        <p className="text-sm text-destructive">{queue.error.message}</p>
-      )}
-      <Button type="submit" className="w-full" disabled={queue.isPending}>
-        {queue.isPending ? "Starting..." : "Start Task"}
-      </Button>
-    </form>
   );
 }

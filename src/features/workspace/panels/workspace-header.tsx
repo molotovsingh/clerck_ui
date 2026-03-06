@@ -38,7 +38,7 @@ export function WorkspaceHeader({
         {/* Left: nav + matter info */}
         <div className="flex items-center gap-3">
           <Link
-            to="/"
+            to="/matters"
             className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useMatterReadiness, useUpdateMatterStatus } from "@/hooks/use-matters";
-import { useRequiredV1Drafts } from "@/hooks/use-drafts";
 import { useCreateExport } from "@/hooks/use-artifacts";
 import { useIntakeContext } from "@/hooks/use-intake";
 import { MatterStatus, ArtifactKind } from "@/types/enums";
@@ -37,23 +36,13 @@ import {
   Gavel,
 } from "lucide-react";
 
-const CHECK_LABELS: Record<string, string> = {
-  intake_gate: "Case details complete",
-  status_for_client_approval: "Ready for client review",
-  intake_manifest: "Evidence uploaded",
-  claim_source_refs: "Claims linked to evidence",
-  approved_draft: "At least one document approved",
-  required_v1_drafts_approved: "All required documents approved",
-  status_for_court_bundle: "Ready for court filing",
-  approval_metadata: "Client approval recorded",
-};
-
 interface Props {
   matterId: string;
   matterStatus: MatterStatus;
+  allowedTransitions: MatterStatus[];
 }
 
-export function FilingWizard({ matterId, matterStatus }: Props) {
+export function FilingWizard({ matterId, matterStatus, allowedTransitions }: Props) {
   const open = useWorkspaceStore((s) => s.filingWizardOpen);
   const setOpen = useWorkspaceStore((s) => s.setFilingWizardOpen);
   const [step, setStep] = useState(0);
@@ -84,6 +73,7 @@ export function FilingWizard({ matterId, matterStatus }: Props) {
           <StatusAdvanceStep
             matterId={matterId}
             matterStatus={matterStatus}
+            allowedTransitions={allowedTransitions}
             onBack={() => setStep(1)}
             onDone={() => {
               setOpen(false);
@@ -104,11 +94,11 @@ function ReadinessStep({
   onNext: () => void;
 }) {
   const { data: readiness } = useMatterReadiness(matterId);
-  const { data: requiredV1 } = useRequiredV1Drafts(matterId);
 
   if (!readiness) return null;
 
   const allPassed = readiness.checks.every((c) => c.ok);
+  const { required_v1_coverage } = readiness;
 
   return (
     <>
@@ -134,17 +124,17 @@ function ReadinessStep({
               ) : (
                 <XCircle className="h-4 w-4 text-red-400 shrink-0" />
               )}
-              <span>{CHECK_LABELS[check.key] ?? check.key}</span>
+              <span>{check.label}</span>
             </div>
           ))}
         </div>
 
-        {requiredV1 && (
+        {required_v1_coverage && (
           <div className="border-t pt-2">
             <p className="text-xs font-medium text-muted-foreground mb-1">
               Required Documents
             </p>
-            {requiredV1.required.map((item) => (
+            {required_v1_coverage.required.map((item) => (
               <div
                 key={item.doc_type}
                 className="flex items-center gap-2 px-2 py-0.5 text-sm"
@@ -279,11 +269,13 @@ function ExportStep({
 function StatusAdvanceStep({
   matterId,
   matterStatus,
+  allowedTransitions,
   onBack,
   onDone,
 }: {
   matterId: string;
   matterStatus: MatterStatus;
+  allowedTransitions: MatterStatus[];
   onBack: () => void;
   onDone: () => void;
 }) {
@@ -291,14 +283,7 @@ function StatusAdvanceStep({
   const updateStatus = useUpdateMatterStatus(matterId);
   const { data: intakeCtx } = useIntakeContext(matterId);
 
-  const statusTransitions: Record<MatterStatus, MatterStatus[]> = {
-    [MatterStatus.INTAKE]: [MatterStatus.UNDER_REVIEW],
-    [MatterStatus.UNDER_REVIEW]: [MatterStatus.CLIENT_APPROVED],
-    [MatterStatus.CLIENT_APPROVED]: [MatterStatus.FILED],
-    [MatterStatus.FILED]: [],
-  };
-
-  const nextStatuses = statusTransitions[matterStatus] ?? [];
+  const nextStatuses = allowedTransitions;
   const intakeBlocked =
     matterStatus === MatterStatus.INTAKE && intakeCtx?.gate_passed !== true;
 

@@ -2,10 +2,10 @@ import { useEffect } from "react";
 import { useParams, Link } from "@tanstack/react-router";
 import { useMatter } from "@/hooks/use-matters";
 import { useCaseLoomStore } from "@/stores/caseloom-store";
-import { CaseLoomActivityBar } from "@/features/caseloom/ide/caseloom-activity-bar";
-import { CaseLoomSidebar } from "@/features/caseloom/ide/caseloom-sidebar";
-import { CaseLoomEditor } from "@/features/caseloom/ide/editor/caseloom-editor";
-import { CaseLoomChatPanel } from "@/features/caseloom/ide/chat/caseloom-chat-panel";
+import { CaseLoomActivityBar } from "@/features/ide/caseloom-activity-bar";
+import { CaseLoomSidebar } from "@/features/ide/caseloom-sidebar";
+import { CaseLoomEditor } from "@/features/ide/editor/caseloom-editor";
+import { CaseLoomChatPanel } from "@/features/ide/chat/caseloom-chat-panel";
 import { LoadingSpinner } from "@/components/common/loading";
 import { formatLabel } from "@/lib/format-label";
 

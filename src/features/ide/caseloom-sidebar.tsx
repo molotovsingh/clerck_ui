@@ -7,7 +7,7 @@ import { useDrafts, useRequiredV1Drafts } from "@/hooks/use-drafts";
 import { useMatter } from "@/hooks/use-matters";
 import { formatLabel } from "@/lib/format-label";
 import { formatRelative } from "@/lib/format-date";
-import { JobStatus, ClaimKind } from "@/types/enums";
+import { JobStatus, ClaimKind, DraftStatus } from "@/types/enums";
 import type { Evidence } from "@/types/evidence";
 import type { Claim } from "@/types/claims";
 import type { Job } from "@/types/jobs";
@@ -389,9 +389,9 @@ function DraftItem({ draft }: { draft: Draft }) {
       </div>
       <Pill
         color={
-          draft.status === "approved"
+          draft.status === DraftStatus.APPROVED
             ? "var(--cl-green)"
-            : draft.status === "review_ready"
+            : draft.status === DraftStatus.REVIEW_READY
               ? "var(--cl-teal)"
               : "var(--cl-dim)"
         }

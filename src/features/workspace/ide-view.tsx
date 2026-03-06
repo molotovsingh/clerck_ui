@@ -3,10 +3,10 @@ import { Link } from "@tanstack/react-router";
 import { useCaseLoomStore } from "@/stores/caseloom-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import type { MatterWorkspaceOut } from "@/types/workspace";
-import { CaseLoomActivityBar } from "@/features/caseloom/ide/caseloom-activity-bar";
-import { CaseLoomSidebar } from "@/features/caseloom/ide/caseloom-sidebar";
-import { CaseLoomEditor } from "@/features/caseloom/ide/editor/caseloom-editor";
-import { CaseLoomChatPanel } from "@/features/caseloom/ide/chat/caseloom-chat-panel";
+import { CaseLoomActivityBar } from "@/features/ide/caseloom-activity-bar";
+import { CaseLoomSidebar } from "@/features/ide/caseloom-sidebar";
+import { CaseLoomEditor } from "@/features/ide/editor/caseloom-editor";
+import { CaseLoomChatPanel } from "@/features/ide/chat/caseloom-chat-panel";
 import { formatLabel } from "@/lib/format-label";
 
 function Pill({ color, text }: { color: string; text: string }) {

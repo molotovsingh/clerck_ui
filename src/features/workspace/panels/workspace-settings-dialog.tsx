@@ -1,11 +1,16 @@
+import { lazy, Suspense } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useWorkspaceStore, type SettingsTab } from "@/stores/workspace-store";
 import type { MatterCapabilities } from "@/types/access";
 import { AccessPanel } from "./access-panel/access-panel";
 import { HandoffPanel } from "./handoff-panel/handoff-panel";
-import { AnalyticsPanel } from "./analytics-panel/analytics-panel";
+import { LoadingSpinner } from "@/components/common/loading";
 import { ScrollArea } from "@/components/ui/scroll-area";
+
+const AnalyticsPanel = lazy(() =>
+  import("./analytics-panel/analytics-panel").then(m => ({ default: m.AnalyticsPanel }))
+);
 
 interface Props {
   matterId: string;
@@ -44,7 +49,9 @@ export function WorkspaceSettingsDialog({ matterId, capabilities }: Props) {
               <HandoffPanel matterId={matterId} capabilities={capabilities} />
             </TabsContent>
             <TabsContent value="analytics" className="m-0">
-              <AnalyticsPanel matterId={matterId} />
+              <Suspense fallback={<div className="flex justify-center py-12"><LoadingSpinner /></div>}>
+                <AnalyticsPanel matterId={matterId} />
+              </Suspense>
             </TabsContent>
           </ScrollArea>
         </Tabs>

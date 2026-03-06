@@ -60,7 +60,7 @@ function InlineCreateMatter() {
       setClientName("");
       setExpanded(false);
       router.navigate({
-        to: "/clerk/$matterId",
+        to: "/matters/$matterId",
         params: { matterId: result.public_id },
       });
     } catch { /* error displayed via createMatter.error */ }
@@ -166,7 +166,7 @@ function ClerkMatterSelector() {
       {matters.map((m) => (
         <Link
           key={m.public_id}
-          to="/clerk/$matterId"
+          to="/matters/$matterId"
           params={{ matterId: m.public_id }}
           className="flex items-center justify-between rounded-lg border p-3 hover:bg-muted transition-colors"
         >

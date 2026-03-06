@@ -37,15 +37,19 @@ const defaultSections: Record<string, boolean> = {
   OUTBOX: true,
 };
 
-export const useCaseLoomStore = create<CaseLoomState>()((set, get) => ({
-  activityView: "explorer",
+const initialState = {
+  activityView: "explorer" as ActivityView,
   openSections: { ...defaultSections },
-  activeDraftId: null,
-  activeVersionNumber: null,
-  activeSectionKey: null,
+  activeDraftId: null as number | null,
+  activeVersionNumber: null as number | null,
+  activeSectionKey: null as string | null,
   chatCollapsed: false,
-  selectedThreadId: null,
-  openTabs: [],
+  selectedThreadId: null as string | null,
+  openTabs: [] as OpenTab[],
+};
+
+export const useCaseLoomStore = create<CaseLoomState>()((set, get) => ({
+  ...initialState,
 
   setActivityView: (v) => set({ activityView: v }),
 
@@ -100,14 +104,5 @@ export const useCaseLoomStore = create<CaseLoomState>()((set, get) => ({
     }),
 
   reset: () =>
-    set({
-      activityView: "explorer",
-      openSections: { ...defaultSections },
-      activeDraftId: null,
-      activeVersionNumber: null,
-      activeSectionKey: null,
-      chatCollapsed: false,
-      selectedThreadId: null,
-      openTabs: [],
-    }),
+    set({ ...initialState, openSections: { ...defaultSections } }),
 }));

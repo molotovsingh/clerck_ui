@@ -1,22 +1,9 @@
 import { useMatterReadiness } from "@/hooks/use-matters";
-import { useRequiredV1Drafts } from "@/hooks/use-drafts";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/common/loading";
 import { CheckCircle2, XCircle, AlertCircle, ArrowRight } from "lucide-react";
 import { formatLabel } from "@/lib/format-label";
-
-// Human-readable labels for check keys
-const CHECK_LABELS: Record<string, string> = {
-  intake_gate: "Case details complete",
-  status_for_client_approval: "Ready for client review",
-  intake_manifest: "Evidence uploaded",
-  claim_source_refs: "Claims linked to evidence",
-  approved_draft: "At least one document approved",
-  required_v1_drafts_approved: "All required documents approved",
-  status_for_court_bundle: "Ready for court filing",
-  approval_metadata: "Client approval recorded",
-};
 
 export interface ReadinessNavigationTarget {
   leftTab?: string;
@@ -26,8 +13,8 @@ export interface ReadinessNavigationTarget {
 }
 
 const CHECK_NAVIGATION: Record<string, ReadinessNavigationTarget> = {
-  intake_gate: { route: "/clerk/$matterId" },
-  intake_manifest: { route: "/clerk/$matterId" },
+  intake_gate: { route: "/matters/$matterId" },
+  intake_manifest: { route: "/matters/$matterId" },
   claim_source_refs: { leftTab: "claims" },
   status_for_client_approval: { rightTab: "status" },
   status_for_court_bundle: { rightTab: "status" },
@@ -43,20 +30,18 @@ interface ReadinessPanelProps {
 
 export function ReadinessPanel({ matterId, onNavigate }: ReadinessPanelProps) {
   const { data: readiness, isLoading } = useMatterReadiness(matterId);
-  const { data: requiredV1 } = useRequiredV1Drafts(matterId);
 
   if (isLoading) return <LoadingSpinner />;
   if (!readiness) return null;
 
-  const passedCount = readiness.checks.filter((c) => c.ok).length;
-  const totalCount = readiness.checks.length;
+  const { passed_count, total_count, required_v1_coverage } = readiness;
 
   return (
     <div className="space-y-4">
       {/* Progress summary */}
       <div className="flex items-center gap-3">
         <span className="text-sm font-semibold">
-          {passedCount} of {totalCount} requirements met
+          {passed_count} of {total_count} requirements met
         </span>
         {readiness.intake_gate_passed ? (
           <Badge className="bg-green-100 text-green-800 border-green-200">
@@ -89,7 +74,7 @@ export function ReadinessPanel({ matterId, onNavigate }: ReadinessPanelProps) {
                   <XCircle className="h-4 w-4 mt-0.5 text-red-400 shrink-0" />
                 )}
                 <span className="flex-1 text-left">
-                  {CHECK_LABELS[check.key] ?? check.key}
+                  {check.label}
                 </span>
                 {!check.ok && nav && onNavigate && (
                   <Button
@@ -108,23 +93,23 @@ export function ReadinessPanel({ matterId, onNavigate }: ReadinessPanelProps) {
         </div>
       </div>
 
-      {/* Required V1 Drafts */}
-      {requiredV1 && (
+      {/* Required V1 Drafts (from readiness.required_v1_coverage) */}
+      {required_v1_coverage && (
         <div>
           <div className="flex items-center gap-2 mb-2">
             <h3 className="text-sm font-semibold">Required Documents</h3>
-            {requiredV1.complete ? (
+            {required_v1_coverage.complete ? (
               <Badge className="bg-green-100 text-green-800 border-green-200">
                 Complete
               </Badge>
             ) : (
               <Badge variant="secondary">
-                {requiredV1.required.filter((d) => d.exists).length}/{requiredV1.required.length} created
+                {required_v1_coverage.required.filter((d) => d.exists).length}/{required_v1_coverage.required.length} created
               </Badge>
             )}
           </div>
           <div className="space-y-1">
-            {requiredV1.required.map((item) => (
+            {required_v1_coverage.required.map((item) => (
               <div
                 key={item.doc_type}
                 className="flex items-center gap-2 rounded px-2 py-1.5 text-sm"
