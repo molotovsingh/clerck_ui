@@ -64,7 +64,7 @@ const matterRoute = createRoute({
   component: () => <LazyRoute Component={WorkspacePage} />,
 });
 
-// --- Redirects from old routes ---
+// --- Legacy redirects (safe to remove once old bookmarks expire) ---
 
 const clerkRedirect = createRoute({
   getParentRoute: () => rootRoute,
@@ -98,7 +98,7 @@ const lawyerMatterRedirect = createRoute({
   },
 });
 
-const caseLoomV2Redirect = createRoute({
+const caseLoomRedirect = createRoute({
   getParentRoute: () => rootRoute,
   path: "/caseloom-v2",
   beforeLoad: () => {
@@ -106,7 +106,7 @@ const caseLoomV2Redirect = createRoute({
   },
 });
 
-const caseLoomV2OnboardingRedirect = createRoute({
+const caseLoomOnboardingRedirect = createRoute({
   getParentRoute: () => rootRoute,
   path: "/caseloom-v2/onboarding",
   beforeLoad: () => {
@@ -114,7 +114,7 @@ const caseLoomV2OnboardingRedirect = createRoute({
   },
 });
 
-const caseLoomV2MatterRedirect = createRoute({
+const caseLoomMatterRedirect = createRoute({
   getParentRoute: () => rootRoute,
   path: "/caseloom-v2/$matterId",
   beforeLoad: ({ params }) => {
@@ -126,13 +126,14 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   devRoute,
   matterRoute,
+  // Legacy redirects
   clerkRedirect,
   clerkMatterRedirect,
   lawyerRedirect,
   lawyerMatterRedirect,
-  caseLoomV2Redirect,
-  caseLoomV2OnboardingRedirect,
-  caseLoomV2MatterRedirect,
+  caseLoomRedirect,
+  caseLoomOnboardingRedirect,
+  caseLoomMatterRedirect,
 ]);
 
 export const router = createRouter({ routeTree });
