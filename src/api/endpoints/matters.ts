@@ -10,6 +10,7 @@ import type {
   MatterDeletionRequest,
   MatterDeletionRequestCreate,
 } from "@/types/matters";
+import type { MatterWorkspaceOut, MatterWorkflowState } from "@/types/workspace";
 import { DEFAULT_PAGE_LIMIT } from "@/lib/constants";
 
 export const mattersApi = {
@@ -34,6 +35,9 @@ export const mattersApi = {
       params: { limit: params?.limit ?? DEFAULT_PAGE_LIMIT, offset: params?.offset ?? 0 },
     }),
 
+  getComplianceDefaults: () =>
+    api.get<MatterComplianceOptions>("/compliance/defaults"),
+
   getComplianceOptions: (id: string) =>
     api.get<MatterComplianceOptions>(`/matters/${id}/compliance/options`),
 
@@ -52,4 +56,15 @@ export const mattersApi = {
     api.get<MatterDeletionRequest[]>(`/matters/${id}/deletion-requests`, {
       params: { limit: params?.limit ?? DEFAULT_PAGE_LIMIT, offset: params?.offset ?? 0 },
     }),
+
+  getWorkspace: (matterId: string, include?: string[], previewLimit?: number) =>
+    api.get<MatterWorkspaceOut>(`/matters/${matterId}/workspace`, {
+      params: {
+        include: include ? [...new Set(include)].sort().join(",") : undefined,
+        preview_limit: previewLimit,
+      },
+    }),
+
+  getWorkflowState: (matterId: string) =>
+    api.get<MatterWorkflowState>(`/matters/${matterId}/workflow-state`),
 };

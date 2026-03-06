@@ -12,6 +12,12 @@ export interface IntakeContextUpdate {
   narrative?: string | null;
 }
 
+export type IntakeProgress =
+  import("@/generated/api-types").components["schemas"]["IntakeProgressOut"];
+
+export type IntakeProgressJobCounts =
+  import("@/generated/api-types").components["schemas"]["IntakeProgressJobCountsOut"];
+
 export interface IntakeIngestOut {
   matter_id: number;
   source_dir: string;

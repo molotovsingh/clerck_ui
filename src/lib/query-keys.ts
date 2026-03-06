@@ -16,6 +16,10 @@ export const queryKeys = {
       ["matters", id, "compliance", "options"] as const,
     deletionRequests: (id: string) =>
       ["matters", id, "deletion-requests"] as const,
+    workspace: (id: string, include?: string[]) => {
+      const normalized = include ? [...new Set(include)].sort() : undefined;
+      return ["matters", id, "workspace", normalized] as const;
+    },
   },
   evidence: {
     list: (matterId: string) => ["matters", matterId, "evidence"] as const,
@@ -28,6 +32,8 @@ export const queryKeys = {
     list: (matterId: string) => ["matters", matterId, "claims"] as const,
   },
   intake: {
+    progress: (matterId: string) =>
+      ["matters", matterId, "intake", "progress"] as const,
     context: (matterId: string) =>
       ["matters", matterId, "intake", "context"] as const,
   },

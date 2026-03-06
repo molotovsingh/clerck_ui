@@ -3,9 +3,13 @@ import type {
   IntakeContext,
   IntakeContextUpdate,
   IntakeIngestOut,
+  IntakeProgress,
 } from "@/types/intake";
 
 export const intakeApi = {
+  getProgress: (matterId: string) =>
+    api.get<IntakeProgress>(`/matters/${matterId}/intake/progress`),
+
   getContext: (matterId: string) =>
     api.get<IntakeContext>(`/matters/${matterId}/intake/context`),
 
