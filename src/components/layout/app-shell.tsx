@@ -29,15 +29,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const fullscreen = useWorkspaceStore((s) => s.fullscreen);
 
-  if (fullscreen) {
+  const isCaseLoom = location.pathname.startsWith("/caseloom-v2");
+
+  const isHome = location.pathname === "/";
+
+  if (fullscreen || isCaseLoom || isHome) {
     return <main className="h-screen overflow-hidden">{children}</main>;
   }
 
-  const isMattersActive =
-    location.pathname === "/" ||
-    (location.pathname.startsWith("/") &&
-      !location.pathname.startsWith("/dev"));
+  const isCaseLoomActive = location.pathname.startsWith("/caseloom-v2");
   const isDevActive = location.pathname.startsWith("/dev");
+  const isMattersActive = !isCaseLoomActive && !isDevActive;
 
   return (
     <div className="flex h-screen flex-col">
@@ -49,7 +51,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Link>
           <Separator orientation="vertical" className="h-6" />
           <nav className="flex items-center gap-1">
-            <Link to="/">
+            <Link to="/matters">
               <Button
                 variant={isMattersActive ? "secondary" : "ghost"}
                 size="sm"
@@ -60,6 +62,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               >
                 <ClipboardList className="h-4 w-4" />
                 Matters
+              </Button>
+            </Link>
+            <Link to="/caseloom-v2">
+              <Button
+                variant={isCaseLoomActive ? "secondary" : "ghost"}
+                size="sm"
+                className={cn(
+                  "gap-2 text-muted-foreground",
+                  isCaseLoomActive &&
+                    "bg-secondary font-medium text-foreground"
+                )}
+              >
+                <Scale className="h-4 w-4" />
+                CaseLoom
               </Button>
             </Link>
             {role === Role.ADMIN && (

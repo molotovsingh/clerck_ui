@@ -87,7 +87,7 @@ function InlineCreateMatter() {
       setClientName("");
       setExpanded(false);
       router.navigate({
-        to: "/$matterId",
+        to: "/matters/$matterId",
         params: { matterId: result.public_id },
       });
     } catch {
@@ -127,8 +127,9 @@ function InlineCreateMatter() {
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label className="text-xs">Matter Name</Label>
+              <Label htmlFor="matter-name" className="text-xs">Matter Name</Label>
               <Input
+                id="matter-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Smith v. Jones"
@@ -136,8 +137,9 @@ function InlineCreateMatter() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs">Client Name</Label>
+              <Label htmlFor="client-name" className="text-xs">Client Name</Label>
               <Input
+                id="client-name"
                 value={clientName}
                 onChange={(e) => setClientName(e.target.value)}
                 placeholder="John Smith"
@@ -240,7 +242,7 @@ function MatterList() {
           {filtered.map((m) => (
             <Link
               key={m.public_id}
-              to="/$matterId"
+              to="/matters/$matterId"
               params={{ matterId: m.public_id }}
               className="group block rounded-lg border p-4 hover:border-primary/30 hover:bg-muted/50 transition-colors"
             >

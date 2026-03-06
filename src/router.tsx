@@ -10,6 +10,11 @@ import { AuthGuard } from "@/components/auth/auth-guard";
 import { AppShell } from "@/components/layout/app-shell";
 import { LoadingPage } from "@/components/common/loading";
 
+const HomePage = lazy(() =>
+  import("@/features/home/home-page").then((m) => ({
+    default: m.HomePage,
+  }))
+);
 const MatterLauncher = lazy(() =>
   import("@/features/matters/matter-launcher").then((m) => ({
     default: m.MatterLauncher,
@@ -23,6 +28,21 @@ const DevConsolePage = lazy(() =>
 const WorkspacePage = lazy(() =>
   import("@/features/workspace/workspace-page").then((m) => ({
     default: m.WorkspacePage,
+  }))
+);
+const CaseLoomV2DashboardPage = lazy(() =>
+  import("@/features/ide-v2/caseloom-v2-dashboard-page").then((m) => ({
+    default: m.CaseLoomV2DashboardPage,
+  }))
+);
+const CaseLoomV2OnboardingPage = lazy(() =>
+  import("@/features/ide-v2/caseloom-v2-onboarding-page").then((m) => ({
+    default: m.CaseLoomV2OnboardingPage,
+  }))
+);
+const CaseLoomV2IDEPage = lazy(() =>
+  import("@/features/ide-v2/caseloom-v2-ide-page").then((m) => ({
+    default: m.CaseLoomV2IDEPage,
   }))
 );
 
@@ -49,6 +69,12 @@ const rootRoute = createRootRoute({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
+  component: () => <LazyRoute Component={HomePage} />,
+});
+
+const mattersRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/matters",
   component: () => <LazyRoute Component={MatterLauncher} />,
 });
 
@@ -60,7 +86,7 @@ const devRoute = createRoute({
 
 const matterRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/$matterId",
+  path: "/matters/$matterId",
   component: () => <LazyRoute Component={WorkspacePage} />,
 });
 
@@ -70,7 +96,7 @@ const clerkRedirect = createRoute({
   getParentRoute: () => rootRoute,
   path: "/clerk",
   beforeLoad: () => {
-    throw redirect({ to: "/" });
+    throw redirect({ to: "/matters" });
   },
 });
 
@@ -78,7 +104,7 @@ const clerkMatterRedirect = createRoute({
   getParentRoute: () => rootRoute,
   path: "/clerk/$matterId",
   beforeLoad: ({ params }) => {
-    throw redirect({ to: "/$matterId", params: { matterId: params.matterId } });
+    throw redirect({ to: "/matters/$matterId", params: { matterId: params.matterId } });
   },
 });
 
@@ -86,7 +112,7 @@ const lawyerRedirect = createRoute({
   getParentRoute: () => rootRoute,
   path: "/lawyer",
   beforeLoad: () => {
-    throw redirect({ to: "/" });
+    throw redirect({ to: "/matters" });
   },
 });
 
@@ -94,46 +120,56 @@ const lawyerMatterRedirect = createRoute({
   getParentRoute: () => rootRoute,
   path: "/lawyer/$matterId",
   beforeLoad: ({ params }) => {
-    throw redirect({ to: "/$matterId", params: { matterId: params.matterId } });
+    throw redirect({ to: "/matters/$matterId", params: { matterId: params.matterId } });
   },
 });
 
-const caseLoomRedirect = createRoute({
+// --- CaseLoom v2 routes (own full-screen layout, bypasses AppShell) ---
+
+const caseLoomLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
+  id: "caseloom-layout",
+  component: () => (
+    <Suspense fallback={<LoadingPage />}>
+      <Outlet />
+    </Suspense>
+  ),
+});
+
+const caseLoomDashboardRoute = createRoute({
+  getParentRoute: () => caseLoomLayoutRoute,
   path: "/caseloom-v2",
-  beforeLoad: () => {
-    throw redirect({ to: "/" });
-  },
+  component: () => <LazyRoute Component={CaseLoomV2DashboardPage} />,
 });
 
-const caseLoomOnboardingRedirect = createRoute({
-  getParentRoute: () => rootRoute,
+const caseLoomOnboardingRoute = createRoute({
+  getParentRoute: () => caseLoomLayoutRoute,
   path: "/caseloom-v2/onboarding",
-  beforeLoad: () => {
-    throw redirect({ to: "/" });
-  },
+  component: () => <LazyRoute Component={CaseLoomV2OnboardingPage} />,
 });
 
-const caseLoomMatterRedirect = createRoute({
-  getParentRoute: () => rootRoute,
+const caseLoomMatterRoute = createRoute({
+  getParentRoute: () => caseLoomLayoutRoute,
   path: "/caseloom-v2/$matterId",
-  beforeLoad: ({ params }) => {
-    throw redirect({ to: "/$matterId", params: { matterId: params.matterId } });
-  },
+  component: () => <LazyRoute Component={CaseLoomV2IDEPage} />,
 });
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
+  mattersRoute,
   devRoute,
   matterRoute,
+  // CaseLoom v2
+  caseLoomLayoutRoute.addChildren([
+    caseLoomDashboardRoute,
+    caseLoomOnboardingRoute,
+    caseLoomMatterRoute,
+  ]),
   // Legacy redirects
   clerkRedirect,
   clerkMatterRedirect,
   lawyerRedirect,
   lawyerMatterRedirect,
-  caseLoomRedirect,
-  caseLoomOnboardingRedirect,
-  caseLoomMatterRedirect,
 ]);
 
 export const router = createRouter({ routeTree });

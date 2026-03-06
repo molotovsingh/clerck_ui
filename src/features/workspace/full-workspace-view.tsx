@@ -1,10 +1,10 @@
 import type { MatterWorkspaceOut } from "@/types/workspace";
 import { useWorkspaceStore } from "@/stores/workspace-store";
-import { WorkspaceHeader } from "@/features/lawyer-workspace/workspace-header";
-import { WorkspaceSettingsDialog } from "@/features/lawyer-workspace/workspace-settings-dialog";
-import { FilingWizard } from "@/features/lawyer-workspace/filing-wizard";
-import { ReviewMode } from "@/features/lawyer-workspace/review-mode/review-mode";
-import { DraftMode } from "@/features/lawyer-workspace/draft-mode/draft-mode";
+import { WorkspaceHeader } from "@/features/workspace/panels/workspace-header";
+import { WorkspaceSettingsDialog } from "@/features/workspace/panels/workspace-settings-dialog";
+import { FilingWizard } from "@/features/workspace/panels/filing-wizard";
+import { ReviewMode } from "@/features/workspace/panels/review-mode/review-mode";
+import { DraftMode } from "@/features/workspace/panels/draft-mode/draft-mode";
 
 interface Props {
   matterId: string;
@@ -38,7 +38,7 @@ export function FullWorkspaceView({ matterId, workspace }: Props) {
         matterId={matterId}
         capabilities={capabilities}
       />
-      <FilingWizard matterId={matterId} matterStatus={matter.status} />
+      <FilingWizard matterId={matterId} matterStatus={matter.status} allowedTransitions={workflow_state.allowed_transitions} />
     </div>
   );
 }

@@ -1,20 +1,18 @@
 import { useRef, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { useUpdateMatterStatus } from "@/hooks/use-matters";
-import { useIntakeContext } from "@/hooks/use-intake";
-import { useEvidence } from "@/hooks/use-evidence";
-import { useJobs } from "@/hooks/use-jobs";
-import { MatterStatus, JobStatus } from "@/types/enums";
+import { useIntakeProgress } from "@/hooks/use-intake";
+import { MatterStatus } from "@/types/enums";
 import type { MatterWorkspaceOut } from "@/types/workspace";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/common/status-badge";
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
-import { UploadCard } from "@/features/clerk-intake/upload-card";
-import { DisputeCard } from "@/features/clerk-intake/dispute-card";
-import { DocumentsCard } from "@/features/clerk-intake/documents-card";
-import { JobsTrackerCard } from "@/features/clerk-intake/jobs-tracker-card";
-import { ProgressRail } from "@/features/clerk-intake/progress-rail";
+import { UploadCard } from "@/features/workspace/intake/upload-card";
+import { DisputeCard } from "@/features/workspace/intake/dispute-card";
+import { DocumentsCard } from "@/features/workspace/intake/documents-card";
+import { JobsTrackerCard } from "@/features/workspace/intake/jobs-tracker-card";
+import { ProgressRail } from "@/features/workspace/intake/progress-rail";
 
 interface Props {
   matterId: string;
@@ -23,17 +21,13 @@ interface Props {
 
 export function IntakeView({ matterId, workspace }: Props) {
   const { matter } = workspace;
-  const { data: context } = useIntakeContext(matterId);
-  const { data: evidence } = useEvidence(matterId);
-  const { data: jobs } = useJobs(matterId);
+  const { data: progress } = useIntakeProgress(matterId);
   const updateStatus = useUpdateMatterStatus(matterId);
 
-  const hasEvidence = !!(evidence && evidence.length > 0);
-  const intakeReady = context?.gate_passed === true;
+  const hasEvidence = progress?.has_evidence ?? false;
+  const intakeReady = progress?.context.gate_passed === true;
   const canOrder = hasEvidence && intakeReady;
-  const hasSucceededJob = (jobs ?? []).some(
-    (j) => j.status === JobStatus.SUCCEEDED
-  );
+  const hasSucceededJob = progress?.has_successful_job ?? false;
 
   const step1Done = hasEvidence;
   const step2Done = intakeReady;
@@ -91,7 +85,7 @@ export function IntakeView({ matterId, workspace }: Props) {
         />
         <div className="flex-1 max-w-4xl space-y-6 mx-auto">
           <Link
-            to="/"
+            to="/matters"
             className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
