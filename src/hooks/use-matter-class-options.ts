@@ -7,12 +7,22 @@ export interface MatterClassOption {
   label: string;
 }
 
+export interface UseMatterClassResult {
+  suggestions: MatterClassOption[];
+  customSupported: boolean;
+  defaultClass: string | undefined;
+}
+
 /**
- * Fetches allowed matter classes. Uses the global compliance/defaults
- * endpoint when no matterId is available (e.g. the create-matter form),
- * and the matter-scoped endpoint when a matterId exists.
+ * Fetches matter-class options from the compliance endpoint.
+ *
+ * Returns `suggested_matter_classes` as UI suggestions (not a hard allowlist),
+ * a `customSupported` flag indicating whether arbitrary values are accepted,
+ * and the server-side `defaultClass`.
  */
-export function useMatterClassOptions(matterId?: string): MatterClassOption[] {
+export function useMatterClassOptions(
+  matterId?: string,
+): UseMatterClassResult {
   const { data } = useQuery({
     queryKey: matterId
       ? ["compliance", "matter-classes", matterId]
@@ -24,12 +34,13 @@ export function useMatterClassOptions(matterId?: string): MatterClassOption[] {
     staleTime: 5 * 60 * 1000,
   });
 
-  if (data?.allowed_matter_classes?.length) {
-    return data.allowed_matter_classes.map((value) => ({
-      value,
-      label: formatLabel(value),
-    }));
-  }
+  const suggestions: MatterClassOption[] = (
+    data?.suggested_matter_classes ?? []
+  ).map((value) => ({ value, label: formatLabel(value) }));
 
-  return [];
+  return {
+    suggestions,
+    customSupported: data?.custom_matter_class_supported ?? true,
+    defaultClass: data?.default_matter_class,
+  };
 }

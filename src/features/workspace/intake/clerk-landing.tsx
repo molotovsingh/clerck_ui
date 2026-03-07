@@ -43,10 +43,13 @@ function InlineCreateMatter() {
   const [expanded, setExpanded] = useState(false);
   const [name, setName] = useState("");
   const [clientName, setClientName] = useState("");
-  const [matterClass, setMatterClass] = useState("general_dispute");
+  const [matterClass, setMatterClass] = useState("");
   const createMatter = useCreateMatter();
-  const matterClasses = useMatterClassOptions();
+  const { suggestions, customSupported, defaultClass } = useMatterClassOptions();
   const router = useRouter();
+
+  // Init from server default once loaded
+  if (!matterClass && defaultClass) setMatterClass(defaultClass);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,18 +121,34 @@ function InlineCreateMatter() {
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs">Matter Type</Label>
-            <Select value={matterClass} onValueChange={setMatterClass}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {matterClasses.map((c) => (
-                  <SelectItem key={c.value} value={c.value}>
-                    {c.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {customSupported ? (
+              <>
+                <Input
+                  list="cl-matter-class-suggestions"
+                  value={matterClass}
+                  onChange={(e) => setMatterClass(e.target.value)}
+                  placeholder="e.g. General dispute, debt recovery..."
+                />
+                <datalist id="cl-matter-class-suggestions">
+                  {suggestions.map((c) => (
+                    <option key={c.value} value={c.value}>{c.label}</option>
+                  ))}
+                </datalist>
+              </>
+            ) : (
+              <Select value={matterClass} onValueChange={setMatterClass}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {suggestions.map((c) => (
+                    <SelectItem key={c.value} value={c.value}>
+                      {c.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
           {createMatter.error && (
             <p className="text-sm text-destructive">

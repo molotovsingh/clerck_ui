@@ -12,12 +12,14 @@ describe("useMatterClassOptions", () => {
     mockUseQuery.mockReset();
   });
 
-  it("returns empty array when no data is available yet", () => {
+  it("returns empty suggestions and defaults when no data is available yet", () => {
     mockUseQuery.mockReturnValue({ data: undefined });
 
     const result = useMatterClassOptions();
 
-    expect(result).toEqual([]);
+    expect(result.suggestions).toEqual([]);
+    expect(result.customSupported).toBe(true);
+    expect(result.defaultClass).toBeUndefined();
   });
 
   it("calls global defaults endpoint when no matterId", () => {
@@ -44,24 +46,38 @@ describe("useMatterClassOptions", () => {
     );
   });
 
-  it("returns empty array when API returns empty list", () => {
-    mockUseQuery.mockReturnValue({ data: { allowed_matter_classes: [] } });
-
-    const result = useMatterClassOptions("abc-123");
-
-    expect(result).toEqual([]);
-  });
-
-  it("maps API data through formatLabel when available", () => {
+  it("returns empty suggestions when API returns empty list", () => {
     mockUseQuery.mockReturnValue({
-      data: { allowed_matter_classes: ["debt_recovery", "employment_dispute"] },
+      data: {
+        suggested_matter_classes: [],
+        custom_matter_class_supported: false,
+        default_matter_class: "general_dispute",
+      },
     });
 
     const result = useMatterClassOptions("abc-123");
 
-    expect(result).toEqual([
+    expect(result.suggestions).toEqual([]);
+    expect(result.customSupported).toBe(false);
+    expect(result.defaultClass).toBe("general_dispute");
+  });
+
+  it("maps suggested_matter_classes through formatLabel", () => {
+    mockUseQuery.mockReturnValue({
+      data: {
+        suggested_matter_classes: ["debt_recovery", "employment_dispute"],
+        custom_matter_class_supported: true,
+        default_matter_class: "debt_recovery",
+      },
+    });
+
+    const result = useMatterClassOptions("abc-123");
+
+    expect(result.suggestions).toEqual([
       { value: "debt_recovery", label: "Debt Recovery" },
       { value: "employment_dispute", label: "Employment Dispute" },
     ]);
+    expect(result.customSupported).toBe(true);
+    expect(result.defaultClass).toBe("debt_recovery");
   });
 });
