@@ -1,62 +1,55 @@
+import { useEffect } from "react";
 import { useCaseLoomV2Store } from "@/stores/caseloom-v2-store";
+import { useMatterClassOptions } from "@/hooks/use-matter-class-options";
 
-const QA_FIELDS = [
+interface QAField {
+  id: string;
+  q: string;
+  type: "text" | "date" | "select";
+  required: boolean;
+  ph?: string;
+  opts?: string[];
+}
+
+const QA_FIELDS: QAField[] = [
   {
     id: "case_type",
     q: "What type of case is this?",
-    type: "select" as const,
+    type: "text",
     required: true,
-    opts: [
-      "Contract Dispute",
-      "Personal Injury",
-      "Employment",
-      "Property",
-      "Family Law",
-      "Criminal Defence",
-      "IP / Patent",
-      "Tax Dispute",
-    ],
+    ph: "e.g. Contract dispute, personal injury, employment...",
   },
   {
     id: "jurisdiction",
     q: "What jurisdiction?",
-    type: "select" as const,
+    type: "text",
     required: true,
-    opts: [
-      "England & Wales",
-      "Scotland",
-      "California",
-      "New York",
-      "Texas",
-      "Federal",
-      "EU",
-      "Australia",
-    ],
+    ph: "e.g. England & Wales, California, Federal...",
   },
   {
     id: "client_name",
     q: "Client's full legal name?",
-    type: "text" as const,
+    type: "text",
     required: true,
     ph: "e.g. Sarah Chen",
   },
   {
     id: "opposing",
     q: "Opposing party name?",
-    type: "text" as const,
+    type: "text",
     required: true,
     ph: "e.g. Torres Holdings Ltd",
   },
   {
     id: "filing_date",
     q: "Intended filing date (if known)?",
-    type: "date" as const,
+    type: "date",
     required: false,
   },
   {
     id: "urgency",
     q: "Priority level?",
-    type: "select" as const,
+    type: "select",
     required: false,
     opts: ["Standard", "Urgent", "Critical \u2014 Court deadline"],
   },
@@ -65,9 +58,22 @@ const QA_FIELDS = [
 export function ObCaseDetails() {
   const obQa = useCaseLoomV2Store((s) => s.obQa);
   const updateObQa = useCaseLoomV2Store((s) => s.updateObQa);
+  const { suggestions, customSupported, defaultClass } =
+    useMatterClassOptions();
+
+  // Pre-fill matter_class from server default when user hasn't chosen yet
+  useEffect(() => {
+    if (!obQa.matter_class && defaultClass) {
+      updateObQa("matter_class", defaultClass);
+    }
+  }, [defaultClass, obQa.matter_class, updateObQa]);
 
   const allRequired =
-    obQa.case_type && obQa.jurisdiction && obQa.client_name && obQa.opposing;
+    obQa.case_type &&
+    obQa.jurisdiction &&
+    obQa.client_name &&
+    obQa.opposing &&
+    obQa.matter_class;
 
   const inputStyle: React.CSSProperties = {
     width: "100%",
@@ -80,6 +86,15 @@ export function ObCaseDetails() {
     outline: "none",
     fontFamily: "inherit",
     boxSizing: "border-box",
+  };
+
+  const selectStyle: React.CSSProperties = {
+    ...inputStyle,
+    appearance: "none",
+    WebkitAppearance: "none",
+    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236B6F7B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "right 12px center",
   };
 
   return (
@@ -95,6 +110,56 @@ export function ObCaseDetails() {
       </p>
 
       <div className="flex flex-col gap-3.5">
+        {/* Matter classification */}
+        <div>
+          <label
+            className="mb-1.5 block text-[11px] font-semibold"
+            style={{ color: "var(--cl-muted)" }}
+          >
+            Matter classification
+            <span className="ml-1" style={{ color: "var(--cl-red)" }}>
+              *
+            </span>
+          </label>
+          {customSupported ? (
+            <>
+              <input
+                type="text"
+                list="matter-class-suggestions"
+                placeholder="e.g. General dispute, debt recovery..."
+                value={obQa.matter_class ?? ""}
+                onChange={(e) => updateObQa("matter_class", e.target.value)}
+                style={inputStyle}
+              />
+              <datalist id="matter-class-suggestions">
+                {suggestions.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </datalist>
+            </>
+          ) : (
+            <select
+              value={obQa.matter_class ?? ""}
+              onChange={(e) => updateObQa("matter_class", e.target.value)}
+              style={{
+                ...selectStyle,
+                color: obQa.matter_class
+                  ? "var(--cl-bright)"
+                  : "var(--cl-dim)",
+              }}
+            >
+              <option value="">Select...</option>
+              {suggestions.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+
         {QA_FIELDS.map((q) => (
           <div key={q.id}>
             <label
@@ -116,15 +181,10 @@ export function ObCaseDetails() {
                 }
                 onChange={(e) => updateObQa(q.id, e.target.value)}
                 style={{
-                  ...inputStyle,
-                  appearance: "none",
-                  WebkitAppearance: "none",
+                  ...selectStyle,
                   color: obQa[q.id as keyof typeof obQa]
                     ? "var(--cl-bright)"
                     : "var(--cl-dim)",
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236B6F7B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "right 12px center",
                 }}
               >
                 <option value="">Select...</option>

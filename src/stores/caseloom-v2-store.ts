@@ -7,6 +7,7 @@ export interface OnboardingQA {
   opposing?: string;
   filing_date?: string;
   urgency?: string;
+  matter_class?: string;
 }
 
 interface CaseLoomV2State {

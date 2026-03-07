@@ -39,7 +39,8 @@ export function CaseLoomV2OnboardingPage() {
         obQa.case_type &&
         obQa.jurisdiction &&
         obQa.client_name &&
-        obQa.opposing
+        obQa.opposing &&
+        obQa.matter_class
       );
     return true;
   };
@@ -53,10 +54,25 @@ export function CaseLoomV2OnboardingPage() {
       const matter = await createMatter.mutateAsync({
         name: caseName,
         client_name: clientName,
-        matter_class: "general_dispute",
+        matter_class: obQa.matter_class || "general_dispute",
       });
 
       const matterId = matter.public_id;
+
+      // Persist onboarding case details into intake context (PATCH — partial save)
+      try {
+        await intakeApi.patchContext(matterId, {
+          context_inputs: {
+            case_type: obQa.case_type ?? "",
+            jurisdiction: obQa.jurisdiction ?? "",
+            opposing: obQa.opposing ?? "",
+            filing_date: obQa.filing_date ?? "",
+            urgency: obQa.urgency ?? "",
+          },
+        });
+      } catch {
+        // Non-critical — context can be updated later from the IDE
+      }
 
       // Upload files if any were dropped during onboarding
       if (obFiles.length > 0) {
