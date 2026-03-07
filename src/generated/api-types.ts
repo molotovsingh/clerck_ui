@@ -1016,7 +1016,8 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        /** Patch Intake Context */
+        patch: operations["patch_intake_context_api_v1_matters__matter_public_id__intake_context_patch"];
         trace?: never;
     };
     "/api/v1/matters/{matter_public_id}/intake/ingest": {
@@ -2139,6 +2140,17 @@ export interface components {
             /** Narrative */
             narrative: string | null;
         };
+        /** IntakeContextPatch */
+        IntakeContextPatch: {
+            /** Context Inputs */
+            context_inputs?: {
+                [key: string]: string;
+            } | null;
+            /** Dispute Template */
+            dispute_template?: string | null;
+            /** Narrative */
+            narrative?: string | null;
+        };
         /** IntakeContextUpdate */
         IntakeContextUpdate: {
             /** Context Inputs */
@@ -2325,6 +2337,8 @@ export interface components {
             allowed_matter_classes: string[];
             /** Allowed Retention Policies */
             allowed_retention_policies: string[];
+            /** Custom Matter Class Supported */
+            custom_matter_class_supported: boolean;
             /** Default Matter Class */
             default_matter_class: string;
             /** Default Retention Policy */
@@ -2333,6 +2347,8 @@ export interface components {
             default_retention_policy_by_matter_class: {
                 [key: string]: string;
             };
+            /** Suggested Matter Classes */
+            suggested_matter_classes: string[];
         };
         /** MatterComplianceUpdate */
         MatterComplianceUpdate: {
@@ -5280,6 +5296,45 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["IntakeContextUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IntakeContextOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    patch_intake_context_api_v1_matters__matter_public_id__intake_context_patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                Authorization?: string | null;
+                "X-Firmcase-Actor"?: string | null;
+                "X-Firmcase-Role"?: string | null;
+            };
+            path: {
+                matter_public_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IntakeContextPatch"];
             };
         };
         responses: {

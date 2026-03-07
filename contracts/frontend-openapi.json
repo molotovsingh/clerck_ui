@@ -2565,6 +2565,50 @@
         "title": "IntakeContextOut",
         "type": "object"
       },
+      "IntakeContextPatch": {
+        "properties": {
+          "context_inputs": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context Inputs"
+          },
+          "dispute_template": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dispute Template"
+          },
+          "narrative": {
+            "anyOf": [
+              {
+                "maxLength": 10000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Narrative"
+          }
+        },
+        "title": "IntakeContextPatch",
+        "type": "object"
+      },
       "IntakeContextUpdate": {
         "properties": {
           "context_inputs": {
@@ -3067,6 +3111,10 @@
             "title": "Allowed Retention Policies",
             "type": "array"
           },
+          "custom_matter_class_supported": {
+            "title": "Custom Matter Class Supported",
+            "type": "boolean"
+          },
           "default_matter_class": {
             "title": "Default Matter Class",
             "type": "string"
@@ -3081,11 +3129,20 @@
             },
             "title": "Default Retention Policy By Matter Class",
             "type": "object"
+          },
+          "suggested_matter_classes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Suggested Matter Classes",
+            "type": "array"
           }
         },
         "required": [
           "default_matter_class",
           "allowed_matter_classes",
+          "suggested_matter_classes",
+          "custom_matter_class_supported",
           "default_retention_policy",
           "default_retention_policy_by_matter_class",
           "allowed_retention_policies"
@@ -11315,6 +11372,105 @@
           }
         },
         "summary": "Get Intake Context",
+        "tags": [
+          "intake",
+          "intake"
+        ]
+      },
+      "patch": {
+        "operationId": "patch_intake_context_api_v1_matters__matter_public_id__intake_context_patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_public_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Public Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Firmcase-Actor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Firmcase-Actor"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Firmcase-Role",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Firmcase-Role"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntakeContextPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntakeContextOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Patch Intake Context",
         "tags": [
           "intake",
           "intake"

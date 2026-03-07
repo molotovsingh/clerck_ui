@@ -1,6 +1,7 @@
 import { api } from "../client";
 import type {
   IntakeContext,
+  IntakeContextPatch,
   IntakeContextUpdate,
   IntakeIngestOut,
   IntakeProgress,
@@ -15,6 +16,11 @@ export const intakeApi = {
 
   updateContext: (matterId: string, data: IntakeContextUpdate) =>
     api.put<IntakeContext>(`/matters/${matterId}/intake/context`, {
+      body: data,
+    }),
+
+  patchContext: (matterId: string, data: IntakeContextPatch) =>
+    api.patch<IntakeContext>(`/matters/${matterId}/intake/context`, {
       body: data,
     }),
 

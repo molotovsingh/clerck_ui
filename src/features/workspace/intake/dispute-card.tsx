@@ -62,8 +62,8 @@ export function DisputeCard({ matterId, step1Done, step2Done }: Props) {
     setCtxSaved(false);
     updateCtx.mutate(
       {
-        dispute_template: disputeTemplate || null,
-        narrative: narrative || null,
+        dispute_template: disputeTemplate,
+        narrative: narrative,
         context_inputs: Object.keys(inputs).length > 0 ? inputs : undefined,
       },
       {
