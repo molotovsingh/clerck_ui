@@ -5,6 +5,8 @@ import type {
   AiQualityTrendsOut,
   AiThroughputSummaryOut,
   AmendmentAcceptanceOut,
+  AiClientEmailDraftOut,
+  AiResearchJurisdictionPackOut,
 } from "@/types/ai-analytics";
 
 export const aiAnalyticsApi = {
@@ -50,4 +52,12 @@ export const aiAnalyticsApi = {
     api.get<AmendmentAcceptanceOut>("/ai-amendment-acceptance/team", {
       params: { days: days ?? 30 },
     }),
+
+  clientEmails: (matterId: string) =>
+    api.get<AiClientEmailDraftOut[]>(
+      `/matters/${matterId}/ai-client-emails`
+    ),
+
+  jurisdictionPacks: () =>
+    api.get<AiResearchJurisdictionPackOut[]>("/ai-research/jurisdiction-packs"),
 };

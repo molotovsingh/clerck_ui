@@ -21,12 +21,7 @@ import { toast } from "sonner";
 import { Plus, FolderOpen } from "lucide-react";
 import { Link, useRouter } from "@tanstack/react-router";
 
-const ALLOWED_MATTER_CLASSES = [
-  { value: "general_dispute", label: "General Dispute" },
-  { value: "debt_recovery", label: "Debt Recovery" },
-  { value: "employment_dispute", label: "Employment Dispute" },
-  { value: "regulatory_enforcement", label: "Regulatory Enforcement" },
-] as const;
+import { useMatterClassOptions } from "@/hooks/use-matter-class-options";
 
 export function MattersTable() {
   const { data: matters, isLoading, error, refetch } = useMatters();
@@ -86,14 +81,9 @@ export function MattersTable() {
                     {formatDateTime(m.created_at)}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex gap-1">
-                      <Link to="/clerk/$matterId" params={{ matterId: m.public_id }}>
-                        <Button variant="ghost" size="sm">Intake</Button>
-                      </Link>
-                      <Link to="/lawyer/$matterId" params={{ matterId: m.public_id }}>
-                        <Button variant="ghost" size="sm">Workspace</Button>
-                      </Link>
-                    </div>
+                    <Link to="/matters/$matterId" params={{ matterId: m.public_id }}>
+                      <Button variant="ghost" size="sm">Open</Button>
+                    </Link>
                   </td>
                 </tr>
               ))}
@@ -108,9 +98,13 @@ export function MattersTable() {
 function CreateMatterForm({ onSuccess }: { onSuccess: () => void }) {
   const [name, setName] = useState("");
   const [clientName, setClientName] = useState("");
-  const [matterClass, setMatterClass] = useState("general_dispute");
+  const [matterClass, setMatterClass] = useState("");
   const createMatter = useCreateMatter();
+  const { suggestions, customSupported, defaultClass } = useMatterClassOptions();
   const router = useRouter();
+
+  // Init from server default once loaded
+  if (!matterClass && defaultClass) setMatterClass(defaultClass);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,7 +117,7 @@ function CreateMatterForm({ onSuccess }: { onSuccess: () => void }) {
       toast.success("Matter created");
       onSuccess();
       router.navigate({
-        to: "/clerk/$matterId",
+        to: "/matters/$matterId",
         params: { matterId: result.public_id },
       });
     } catch { /* error displayed via createMatter.error */ }
@@ -151,18 +145,34 @@ function CreateMatterForm({ onSuccess }: { onSuccess: () => void }) {
       </div>
       <div className="space-y-2">
         <Label>Matter Type</Label>
-        <Select value={matterClass} onValueChange={setMatterClass}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {ALLOWED_MATTER_CLASSES.map((c) => (
-              <SelectItem key={c.value} value={c.value}>
-                {c.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {customSupported ? (
+          <>
+            <Input
+              list="dc-matter-class-suggestions"
+              value={matterClass}
+              onChange={(e) => setMatterClass(e.target.value)}
+              placeholder="e.g. General dispute, debt recovery..."
+            />
+            <datalist id="dc-matter-class-suggestions">
+              {suggestions.map((c) => (
+                <option key={c.value} value={c.value}>{c.label}</option>
+              ))}
+            </datalist>
+          </>
+        ) : (
+          <Select value={matterClass} onValueChange={setMatterClass}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {suggestions.map((c) => (
+                <SelectItem key={c.value} value={c.value}>
+                  {c.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
       {createMatter.error && (
         <p className="text-sm text-destructive">

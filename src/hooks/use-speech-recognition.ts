@@ -10,18 +10,43 @@ interface SpeechRecognitionHook {
   resetTranscript: () => void;
 }
 
+// Minimal type surface for the Web Speech API used by this hook.
+// The full SpeechRecognition type is not reliably available across TS DOM libs.
+interface SpeechRecognitionInstance {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: ((event: SpeechRecognitionResultEvent) => void) | null;
+  onerror: ((event: { error: string }) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+}
+
+interface SpeechRecognitionResultEvent {
+  results: {
+    readonly length: number;
+    [index: number]:
+      | {
+          isFinal: boolean;
+          [index: number]: { transcript: string } | undefined;
+        }
+      | undefined;
+  };
+}
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionInstance;
+
 export function useSpeechRecognition(): SpeechRecognitionHook {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [error, setError] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const SpeechRecognitionAPI: any =
-    typeof window !== "undefined"
-      ? (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition
-      : undefined;
+  const w = typeof window !== "undefined" ? (window as unknown as Record<string, unknown>) : undefined;
+  const SpeechRecognitionAPI: SpeechRecognitionConstructor | undefined =
+    (w?.SpeechRecognition as SpeechRecognitionConstructor | undefined) ??
+    (w?.webkitSpeechRecognition as SpeechRecognitionConstructor | undefined);
   const isSupported = !!SpeechRecognitionAPI;
 
   const start = useCallback(() => {
@@ -34,20 +59,20 @@ export function useSpeechRecognition(): SpeechRecognitionHook {
 
     let finalizedText = "";
 
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event: SpeechRecognitionResultEvent) => {
       let interim = "";
       for (let i = 0; i < event.results.length; i++) {
         const result = event.results[i];
-        if (result.isFinal) {
-          finalizedText += result[0].transcript;
+        if (result?.isFinal) {
+          finalizedText += result[0]?.transcript ?? "";
         } else {
-          interim += result[0].transcript;
+          interim += result?.[0]?.transcript ?? "";
         }
       }
       setTranscript(finalizedText + interim);
     };
 
-    recognition.onerror = (event: any) => {
+    recognition.onerror = (event: { error: string }) => {
       setError(event.error);
       setIsListening(false);
     };
@@ -78,5 +103,13 @@ export function useSpeechRecognition(): SpeechRecognitionHook {
     };
   }, []);
 
-  return { isListening, isSupported, transcript, error, start, stop, resetTranscript };
+  return {
+    isListening,
+    isSupported,
+    transcript,
+    error,
+    start,
+    stop,
+    resetTranscript,
+  };
 }

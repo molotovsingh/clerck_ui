@@ -3,6 +3,8 @@ import { useAuthStore } from "@/stores/auth-store";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
+const API_BASE = import.meta.env.VITE_API_BASE ?? "/api/v1";
+
 interface RequestOptions {
   body?: unknown;
   params?: Record<string, string | number | boolean | undefined>;
@@ -10,7 +12,7 @@ interface RequestOptions {
 }
 
 function buildUrl(path: string, params?: RequestOptions["params"]): string {
-  const url = new URL(path, window.location.origin);
+  const url = new URL(API_BASE + path, window.location.origin);
   if (params) {
     for (const [key, value] of Object.entries(params)) {
       if (value !== undefined) {
@@ -106,7 +108,7 @@ export const api = {
 
 export function downloadUrl(path: string): string {
   const state = useAuthStore.getState();
-  const url = new URL(path, window.location.origin);
+  const url = new URL(API_BASE + path, window.location.origin);
   if (state.mode === "bearer" && state.token) {
     url.searchParams.set("token", state.token);
   }

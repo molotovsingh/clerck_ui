@@ -1,3 +1,5 @@
+import { JobStatus } from "./enums";
+
 export interface AiRun {
   id: number;
   run_public_id: string;
@@ -12,7 +14,7 @@ export interface AiRun {
   output_artifact_id: number | null;
   metadata_json: Record<string, unknown> | null;
   cost_json: Record<string, unknown> | null;
-  status: string;
+  status: JobStatus;
   error_message: string | null;
   created_at: string;
   started_at: string | null;

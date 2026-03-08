@@ -62,5 +62,5 @@ export interface RequiredV1DraftItem {
   exists: boolean;
   approved: boolean;
   draft_id: number | null;
-  status: string | null;
+  status: DraftStatus | null;
 }

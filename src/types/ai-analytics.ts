@@ -64,3 +64,20 @@ export interface AmendmentAcceptanceEntry {
 export interface AmendmentAcceptanceOut {
   entries: AmendmentAcceptanceEntry[];
 }
+
+export interface AiClientEmailDraftOut {
+  id: number;
+  matter_id: number;
+  email_type: string;
+  subject: string;
+  body: string;
+  created_at: string;
+}
+
+export interface AiResearchJurisdictionPackOut {
+  id: number;
+  jurisdiction: string;
+  pack_name: string;
+  description: string;
+  created_at: string;
+}

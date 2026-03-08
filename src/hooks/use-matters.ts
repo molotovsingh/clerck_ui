@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { mattersApi } from "@/api/endpoints/matters";
 import { queryKeys } from "@/lib/query-keys";
 import type { MatterCreate, MatterStatusUpdate } from "@/types/matters";
+import type { MatterWorkspaceOut } from "@/types/workspace";
 
 export function useMatters(params?: { limit?: number; offset?: number }) {
   return useQuery({
@@ -42,6 +43,18 @@ export function useMatterReadiness(matterId: string) {
   return useQuery({
     queryKey: queryKeys.matters.readiness(matterId),
     queryFn: () => mattersApi.getReadiness(matterId),
+    enabled: !!matterId,
+  });
+}
+
+export function useWorkspace(matterId: string, include?: string[]) {
+  return useQuery({
+    queryKey: queryKeys.matters.workspace(matterId, include),
+    queryFn: () => mattersApi.getWorkspace(matterId, include),
+    staleTime: (query) => {
+      const data = query.state.data as MatterWorkspaceOut | undefined;
+      return (data?.stale_after_seconds ?? 30) * 1000;
+    },
     enabled: !!matterId,
   });
 }

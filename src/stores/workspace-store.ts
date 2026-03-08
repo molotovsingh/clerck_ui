@@ -1,17 +1,15 @@
 import { create } from "zustand";
 
-export type WorkspaceMode = "review" | "draft";
+export type WorkspaceMode = "intake" | "review" | "draft" | "ide";
 export type SettingsTab = "access" | "transfers" | "analytics";
 
 interface WorkspaceState {
   selectedMatterId: string | null;
   selectedDraftId: number | null;
   selectedSectionKey: string | null;
-  selectedThreadId: string | null;
-  activePanel: string | null;
 
-  // New: mode-based workspace
   mode: WorkspaceMode;
+  fullscreen: boolean;
   aiDrawerOpen: boolean;
   settingsDialogOpen: boolean;
   settingsTab: SettingsTab;
@@ -20,10 +18,9 @@ interface WorkspaceState {
   setSelectedMatterId: (id: string | null) => void;
   setSelectedDraftId: (id: number | null) => void;
   setSelectedSectionKey: (key: string | null) => void;
-  setSelectedThreadId: (id: string | null) => void;
-  setActivePanel: (panel: string | null) => void;
 
   setMode: (mode: WorkspaceMode) => void;
+  setFullscreen: (fullscreen: boolean) => void;
   enterDraftMode: (draftId: number) => void;
   setAiDrawerOpen: (open: boolean) => void;
   openSettings: (tab?: SettingsTab) => void;
@@ -33,34 +30,35 @@ interface WorkspaceState {
   reset: () => void;
 }
 
-export const useWorkspaceStore = create<WorkspaceState>()((set) => ({
-  selectedMatterId: null,
-  selectedDraftId: null,
-  selectedSectionKey: null,
-  selectedThreadId: null,
-  activePanel: null,
-
-  mode: "review",
+const initialState = {
+  selectedMatterId: null as string | null,
+  selectedDraftId: null as number | null,
+  selectedSectionKey: null as string | null,
+  mode: "review" as WorkspaceMode,
+  fullscreen: false,
   aiDrawerOpen: false,
   settingsDialogOpen: false,
-  settingsTab: "access",
+  settingsTab: "access" as SettingsTab,
   filingWizardOpen: false,
+};
+
+export const useWorkspaceStore = create<WorkspaceState>()((set) => ({
+  ...initialState,
 
   setSelectedMatterId: (id) =>
     set({
       selectedMatterId: id,
       selectedDraftId: null,
       selectedSectionKey: null,
-      selectedThreadId: null,
       mode: "review",
+      fullscreen: false,
     }),
   setSelectedDraftId: (id) =>
     set({ selectedDraftId: id, selectedSectionKey: null }),
   setSelectedSectionKey: (key) => set({ selectedSectionKey: key }),
-  setSelectedThreadId: (id) => set({ selectedThreadId: id }),
-  setActivePanel: (panel) => set({ activePanel: panel }),
 
-  setMode: (mode) => set({ mode }),
+  setMode: (mode) => set({ mode, fullscreen: mode === "ide" }),
+  setFullscreen: (fullscreen) => set({ fullscreen }),
   enterDraftMode: (draftId) =>
     set({ mode: "draft", selectedDraftId: draftId, selectedSectionKey: null }),
   setAiDrawerOpen: (open) => set({ aiDrawerOpen: open }),
@@ -69,17 +67,5 @@ export const useWorkspaceStore = create<WorkspaceState>()((set) => ({
   closeSettings: () => set({ settingsDialogOpen: false }),
   setFilingWizardOpen: (open) => set({ filingWizardOpen: open }),
 
-  reset: () =>
-    set({
-      selectedMatterId: null,
-      selectedDraftId: null,
-      selectedSectionKey: null,
-      selectedThreadId: null,
-      activePanel: null,
-      mode: "review",
-      aiDrawerOpen: false,
-      settingsDialogOpen: false,
-      settingsTab: "access",
-      filingWizardOpen: false,
-    }),
+  reset: () => set({ ...initialState }),
 }));

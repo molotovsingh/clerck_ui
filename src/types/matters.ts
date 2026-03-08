@@ -1,79 +1,52 @@
-import type { MatterStatus } from "./enums";
+/**
+ * Matter types — sourced from the generated OpenAPI contract.
+ * Run `npm run sync:contract && npm run generate:types` to refresh.
+ *
+ * Fields that the backend returns as string unions (e.g. MatterStatus)
+ * are narrowed here to our local enums so existing code stays unchanged.
+ */
+import type { components } from "@/generated/api-types";
+import type { MatterStatus, MatterDeletionStatus } from "./enums";
 
-export interface Matter {
-  public_id: string;
-  name: string;
-  client_name: string;
-  matter_class: string;
-  retention_policy: string | null;
-  legal_hold: boolean;
+// The generated MatterOut uses a string-union for `status`;
+// we override it with our MatterStatus enum for local type safety.
+export type Matter = Omit<components["schemas"]["MatterOut"], "status"> & {
   status: MatterStatus;
-  created_at: string;
-  updated_at: string;
-}
+};
 
-export interface MatterCreate {
-  name: string;
-  client_name: string;
-  matter_class: string;
-}
+export type MatterCreate = components["schemas"]["MatterCreate"];
 
-export interface MatterStatusUpdate {
+export type MatterStatusUpdate = Omit<
+  components["schemas"]["MatterStatusUpdate"],
+  "status"
+> & {
   status: MatterStatus;
-  approval_name?: string;
-  approval_date?: string;
-}
+};
 
-export interface MatterReadiness {
-  matter_public_id: string;
+export type MatterReadiness = Omit<
+  components["schemas"]["MatterReadinessOut"],
+  "matter_status"
+> & {
   matter_status: MatterStatus;
-  intake_gate_passed: boolean;
-  validation_gate_passed: boolean;
-  ready_for_client_approval: boolean;
-  ready_for_court_bundle: boolean;
-  approval_name: string | null;
-  approval_date: string | null;
-  checks: MatterReadinessCheck[];
-}
+};
 
-export interface MatterReadinessCheck {
-  key: string;
-  ok: boolean;
-  detail: string;
-}
+export type MatterReadinessCheck =
+  components["schemas"]["MatterReadinessCheck"];
 
-export interface AuditEvent {
-  actor: string;
-  action: string;
-  detail_json: Record<string, unknown> | null;
-  created_at: string;
-}
+export type AuditEvent = components["schemas"]["AuditEventOut"];
 
-export interface MatterComplianceOptions {
-  default_matter_class: string;
-  allowed_matter_classes: string[];
-  default_retention_policy: string;
-  default_retention_policy_by_matter_class: Record<string, string>;
-  allowed_retention_policies: string[];
-}
+export type MatterComplianceOptions =
+  components["schemas"]["MatterComplianceOptionsOut"];
 
-export interface MatterComplianceUpdate {
-  matter_class?: string;
-  retention_policy?: string;
-  legal_hold?: boolean;
-}
+export type MatterComplianceUpdate =
+  components["schemas"]["MatterComplianceUpdate"];
 
-export interface MatterDeletionRequest {
-  request_public_id: string;
-  matter_id: number;
-  requested_by: string;
-  reason: string;
-  status: string;
-  blocked_reason: string | null;
-  created_at: string;
-  updated_at: string;
-}
+export type MatterDeletionRequest = Omit<
+  components["schemas"]["MatterDeletionRequestOut"],
+  "status"
+> & {
+  status: MatterDeletionStatus;
+};
 
-export interface MatterDeletionRequestCreate {
-  reason: string;
-}
+export type MatterDeletionRequestCreate =
+  components["schemas"]["MatterDeletionRequestCreate"];

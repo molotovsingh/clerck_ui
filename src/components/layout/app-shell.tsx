@@ -1,5 +1,6 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { useAuthStore } from "@/stores/auth-store";
+import { useWorkspaceStore } from "@/stores/workspace-store";
 import { Role } from "@/types/enums";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,10 +12,7 @@ import {
 } from "@/components/ui/tooltip";
 import {
   Scale,
-  Terminal,
   ClipboardList,
-  Briefcase,
-  Layers,
   LogOut,
   Settings,
   Sun,
@@ -26,25 +24,22 @@ import { formatLabel } from "@/lib/format-label";
 import { useThemeStore, type Theme } from "@/stores/theme-store";
 import { CommandPalette } from "@/components/common/command-palette";
 
-const primarySurfaces = [
-  { path: "/clerk", label: "Matters", icon: ClipboardList },
-  { path: "/lawyer", label: "Lawyer Workspace", icon: Briefcase },
-  { path: "/caseloom-v2", label: "CaseLoom", icon: Layers },
-] as const;
-
-const advancedSurfaces = [
-  { path: "/dev", label: "Dev Console", icon: Terminal },
-] as const;
-
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { actor, role, logout } = useAuthStore();
   const location = useLocation();
+  const fullscreen = useWorkspaceStore((s) => s.fullscreen);
 
-  // CaseLoom IDE gets the full viewport — no shell header
-  const isFullscreenIDE = /^\/caseloom(-v2)?(\/|$)/.test(location.pathname);
-  if (isFullscreenIDE) {
+  const isCaseLoom = location.pathname.startsWith("/caseloom-v2");
+
+  const isHome = location.pathname === "/";
+
+  if (fullscreen || isCaseLoom || isHome) {
     return <main className="h-screen overflow-hidden">{children}</main>;
   }
+
+  const isCaseLoomActive = location.pathname.startsWith("/caseloom-v2");
+  const isDevActive = location.pathname.startsWith("/dev");
+  const isMattersActive = !isCaseLoomActive && !isDevActive;
 
   return (
     <div className="flex h-screen flex-col">
@@ -56,43 +51,49 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Link>
           <Separator orientation="vertical" className="h-6" />
           <nav className="flex items-center gap-1">
-            {primarySurfaces.map((s) => {
-              const active = location.pathname.startsWith(s.path);
-              return (
-                <Link key={s.path} to={s.path}>
-                  <Button
-                    variant={active ? "secondary" : "ghost"}
-                    size="sm"
-                    className={cn(
-                      "gap-2",
-                      active && "bg-secondary font-medium"
-                    )}
-                  >
-                    <s.icon className="h-4 w-4" />
-                    {s.label}
-                  </Button>
-                </Link>
-              );
-            })}
-            {role === Role.ADMIN &&
-              advancedSurfaces.map((s) => {
-                const active = location.pathname.startsWith(s.path);
-                return (
-                  <Link key={s.path} to={s.path}>
-                    <Button
-                      variant={active ? "secondary" : "ghost"}
-                      size="sm"
-                      className={cn(
-                        "gap-2 text-muted-foreground",
-                        active && "bg-secondary font-medium text-foreground"
-                      )}
-                    >
-                      <Settings className="h-4 w-4" />
-                      {s.label}
-                    </Button>
-                  </Link>
-                );
-              })}
+            <Link to="/matters">
+              <Button
+                variant={isMattersActive ? "secondary" : "ghost"}
+                size="sm"
+                className={cn(
+                  "gap-2",
+                  isMattersActive && "bg-secondary font-medium"
+                )}
+              >
+                <ClipboardList className="h-4 w-4" />
+                Matters
+              </Button>
+            </Link>
+            <Link to="/caseloom-v2">
+              <Button
+                variant={isCaseLoomActive ? "secondary" : "ghost"}
+                size="sm"
+                className={cn(
+                  "gap-2 text-muted-foreground",
+                  isCaseLoomActive &&
+                    "bg-secondary font-medium text-foreground"
+                )}
+              >
+                <Scale className="h-4 w-4" />
+                CaseLoom
+              </Button>
+            </Link>
+            {role === Role.ADMIN && (
+              <Link to="/dev">
+                <Button
+                  variant={isDevActive ? "secondary" : "ghost"}
+                  size="sm"
+                  className={cn(
+                    "gap-2 text-muted-foreground",
+                    isDevActive &&
+                      "bg-secondary font-medium text-foreground"
+                  )}
+                >
+                  <Settings className="h-4 w-4" />
+                  Dev Console
+                </Button>
+              </Link>
+            )}
           </nav>
         </div>
         <div className="flex items-center gap-3">
@@ -120,13 +121,20 @@ function ThemeToggle() {
     setTheme(next);
   };
 
-  const Icon = theme === "dark" ? Moon : theme === "light" ? Sun : Monitor;
-  const label = theme === "system" ? "System" : theme === "light" ? "Light" : "Dark";
+  const Icon =
+    theme === "dark" ? Moon : theme === "light" ? Sun : Monitor;
+  const label =
+    theme === "system" ? "System" : theme === "light" ? "Light" : "Dark";
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" size="icon" onClick={cycle} aria-label={`Theme: ${label}`}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={cycle}
+          aria-label={`Theme: ${label}`}
+        >
           <Icon className="h-4 w-4" />
         </Button>
       </TooltipTrigger>

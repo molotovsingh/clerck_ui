@@ -1,34 +1,19 @@
-import type { MatterAccessRole } from "./enums";
+/**
+ * Access types — sourced from the generated OpenAPI contract.
+ * Run `npm run sync:contract && npm run generate:types` to refresh.
+ */
+import type { components } from "@/generated/api-types";
 
-export interface MatterAccess {
-  actor: string;
-  role: MatterAccessRole;
-  created_at: string;
-}
+export type MatterAccess = components["schemas"]["MatterAccessOut"];
 
-export interface MatterCapabilities {
-  intake_context_write: boolean;
-  draft_read: boolean;
-  draft_comment: boolean;
-  draft_write: boolean;
-  claim_write: boolean;
-  handoff_write: boolean;
-  status_write: boolean;
-  queue_jobs: boolean;
-  export: boolean;
-  upload_evidence: boolean;
-  manage_access: boolean;
-  compliance_write: boolean;
-}
+export type MatterCapabilities =
+  components["schemas"]["MatterAccessCapabilitiesOut"];
 
-export interface MatterAccessSelf {
-  actor: string;
-  role: MatterAccessRole;
-  capabilities: MatterCapabilities;
+export type MatterAccessSelf = Omit<
+  components["schemas"]["MatterAccessSelfOut"],
+  "write_blocked_by_handoff_actor"
+> & {
   write_blocked_by_handoff_actor: string | null;
-}
+};
 
-export interface MatterAccessGrant {
-  actor: string;
-  role: MatterAccessRole;
-}
+export type MatterAccessGrant = components["schemas"]["MatterAccessGrant"];
