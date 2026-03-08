@@ -71,7 +71,7 @@ export function CaseLoomV2OnboardingPage() {
           },
         });
       } catch {
-        // Non-critical — context can be updated later from the IDE
+        showToast("Case details could not be saved — you can re-enter them from the IDE", "var(--cl-red)");
       }
 
       // Upload files if any were dropped during onboarding

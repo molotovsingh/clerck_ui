@@ -87,7 +87,7 @@ export function ObUpload() {
               : "Drag & drop files here, or click to browse"}
         </div>
         <div className="mt-1 text-xs" style={{ color: "var(--cl-dim)" }}>
-          PDF, DOCX, TXT, JPG, ZIP, MP3 — anything
+          PDF, TXT, JPG, PNG and other text-based formats
         </div>
       </div>
 

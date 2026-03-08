@@ -91,8 +91,6 @@ export function CaseCardV2({ matter }: CaseCardV2Props) {
         <div className="mb-2 flex items-start justify-between">
           <div>
             <div className="text-sm font-bold" style={{ color: "var(--cl-bright)" }}>
-              {matter.client_name}{" "}
-              <span style={{ color: "var(--cl-dim)", fontWeight: 400 }}>v.</span>{" "}
               {matter.name}
             </div>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
