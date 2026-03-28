@@ -30,10 +30,22 @@ export function ObUpload() {
     [obFiles, setObFiles]
   );
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, open: openFileDialog } = useDropzone({
     onDrop,
     multiple: true,
+    noClick: true,
   });
+
+  const browseFolder = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.webkitdirectory = true;
+    input.multiple = true;
+    input.onchange = () => {
+      if (input.files) onDrop(Array.from(input.files));
+    };
+    input.click();
+  };
 
   const hasFiles = obFiles.length > 0;
 
@@ -84,9 +96,39 @@ export function ObUpload() {
             ? `${obFiles.length} file${obFiles.length !== 1 ? "s" : ""} ready`
             : isDragActive
               ? "Drop files here..."
-              : "Drag & drop files here, or click to browse"}
+              : "Drag & drop files or folders here"}
         </div>
-        <div className="mt-1 text-xs" style={{ color: "var(--cl-dim)" }}>
+        {!isDragActive && (
+          <div className="mt-3 flex justify-center gap-2">
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); openFileDialog(); }}
+              className="cursor-pointer rounded-lg px-4 py-2 text-[12px] font-semibold"
+              style={{
+                background: "var(--cl-surface)",
+                border: "1px solid var(--cl-border)",
+                color: "var(--cl-muted)",
+                fontFamily: "inherit",
+              }}
+            >
+              Browse Files
+            </button>
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); browseFolder(); }}
+              className="cursor-pointer rounded-lg px-4 py-2 text-[12px] font-semibold"
+              style={{
+                background: "var(--cl-surface)",
+                border: "1px solid var(--cl-border)",
+                color: "var(--cl-muted)",
+                fontFamily: "inherit",
+              }}
+            >
+              Browse Folder
+            </button>
+          </div>
+        )}
+        <div className="mt-2 text-xs" style={{ color: "var(--cl-dim)" }}>
           PDF, DOCX, TXT, JPG, ZIP, MP3 — anything
         </div>
       </div>

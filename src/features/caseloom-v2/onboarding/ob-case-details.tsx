@@ -1,37 +1,80 @@
 import { useCaseLoomV2Store } from "@/stores/caseloom-v2-store";
+import { ObComboBox } from "./ob-combo-box";
+
+const CASE_TYPE_SUGGESTIONS = [
+  // Civil
+  "Contract Dispute",
+  "Property & Real Estate",
+  "Landlord-Tenant",
+  "Consumer Protection",
+  "Recovery of Money / Debt",
+  "Partnership & Joint Venture",
+  "Insurance Claim",
+  // Commercial
+  "Company & Shareholder Dispute",
+  "Banking & Finance",
+  "Insolvency & Bankruptcy",
+  "IP / Patent / Trademark",
+  "Tax Dispute",
+  "Securities & Capital Markets",
+  // Employment
+  "Employment Dispute",
+  "Industrial & Labour",
+  "Sexual Harassment (POSH)",
+  // Family
+  "Divorce & Matrimonial",
+  "Child Custody & Guardianship",
+  "Succession & Inheritance",
+  "Domestic Violence",
+  // Criminal & Regulatory
+  "Criminal Defence",
+  "White Collar / Economic Offences",
+  "Environmental",
+  "Regulatory & Compliance",
+  "Anti-Corruption (PCA)",
+  // Personal & Tort
+  "Personal Injury",
+  "Medical Negligence",
+  "Motor Accident Claim",
+  "Defamation",
+  // Constitutional & Public
+  "Writ Petition",
+  "Public Interest Litigation",
+  "Land Acquisition",
+  // ADR
+  "Arbitration (Domestic)",
+  "Arbitration (International)",
+];
 
 const QA_FIELDS = [
   {
     id: "case_type",
     q: "What type of case is this?",
-    type: "select" as const,
+    type: "combo" as const,
     required: true,
-    opts: [
-      "Contract Dispute",
-      "Personal Injury",
-      "Employment",
-      "Property",
-      "Family Law",
-      "Criminal Defence",
-      "IP / Patent",
-      "Tax Dispute",
-    ],
+    opts: CASE_TYPE_SUGGESTIONS,
+    ph: "Search or type your own...",
   },
   {
     id: "jurisdiction",
     q: "What jurisdiction?",
-    type: "select" as const,
+    type: "combo" as const,
     required: true,
     opts: [
+      "India",
       "England & Wales",
       "Scotland",
       "California",
       "New York",
       "Texas",
-      "Federal",
+      "Federal (US)",
       "EU",
       "Australia",
+      "Singapore",
+      "UAE / DIFC",
+      "Hong Kong",
     ],
+    ph: "Search or type your own...",
   },
   {
     id: "client_name",
@@ -108,7 +151,17 @@ export function ObCaseDetails() {
                 </span>
               )}
             </label>
-            {q.type === "select" ? (
+            {q.type === "combo" ? (
+              <ObComboBox
+                value={
+                  (obQa[q.id as keyof typeof obQa] as string | undefined) ?? ""
+                }
+                onChange={(v) => updateObQa(q.id, v)}
+                suggestions={q.opts ?? []}
+                placeholder={q.ph ?? "Select or type..."}
+                style={inputStyle}
+              />
+            ) : q.type === "select" ? (
               <select
                 value={
                   (obQa[q.id as keyof typeof obQa] as string | undefined) ??
