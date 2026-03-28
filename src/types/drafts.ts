@@ -4,7 +4,7 @@ export interface Draft {
   id: number;
   matter_id: number;
   title: string;
-  doc_type: string;
+  doc_type: string | null;
   status: DraftStatus;
   latest_version: number;
   created_by: string;
@@ -12,6 +12,8 @@ export interface Draft {
   approved_at: string | null;
   created_at: string;
   updated_at: string;
+  has_stale_sections: boolean;
+  stale_section_count: number;
 }
 
 export interface DraftCreate {

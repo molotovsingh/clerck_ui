@@ -10,12 +10,12 @@ import type {
   MatterDeletionRequest,
   MatterDeletionRequestCreate,
 } from "@/types/matters";
-import { DEFAULT_PAGE_LIMIT } from "@/lib/constants";
+import { paginationParams } from "@/lib/constants";
 
 export const mattersApi = {
   list: (params?: { limit?: number; offset?: number }) =>
     api.get<Matter[]>("/matters", {
-      params: { limit: params?.limit ?? DEFAULT_PAGE_LIMIT, offset: params?.offset ?? 0 },
+      params: paginationParams(params),
     }),
 
   get: (id: string) => api.get<Matter>(`/matters/${id}`),
@@ -31,7 +31,7 @@ export const mattersApi = {
 
   listAudit: (id: string, params?: { limit?: number; offset?: number }) =>
     api.get<AuditEvent[]>(`/matters/${id}/audit`, {
-      params: { limit: params?.limit ?? DEFAULT_PAGE_LIMIT, offset: params?.offset ?? 0 },
+      params: paginationParams(params),
     }),
 
   getComplianceOptions: (id: string) =>
@@ -50,6 +50,6 @@ export const mattersApi = {
     params?: { limit?: number; offset?: number }
   ) =>
     api.get<MatterDeletionRequest[]>(`/matters/${id}/deletion-requests`, {
-      params: { limit: params?.limit ?? DEFAULT_PAGE_LIMIT, offset: params?.offset ?? 0 },
+      params: paginationParams(params),
     }),
 };

@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { aiAnalyticsApi } from "@/api/endpoints/ai-analytics";
 import { queryKeys } from "@/lib/query-keys";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { LoadingSpinner } from "@/components/common/loading";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -45,23 +46,40 @@ function CostChart({ matterId }: { matterId: string }) {
   });
 
   if (isLoading) return <LoadingSpinner />;
-  if (!data?.entries?.length)
+  if (!data?.stage_breakdown?.length)
     return <p className="text-sm text-muted-foreground p-4">No cost data available</p>;
 
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm">AI Cost by Model</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm">AI Cost by Stage</CardTitle>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span>${data.total_cost_usd.toFixed(2)} total</span>
+            <Badge
+              variant="outline"
+              className={
+                data.alert_100
+                  ? "text-destructive border-destructive"
+                  : data.alert_80
+                    ? "text-amber-600 border-amber-300"
+                    : "text-muted-foreground"
+              }
+            >
+              {data.utilization_percent}% of budget
+            </Badge>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={250}>
-          <BarChart data={data.entries}>
+          <BarChart data={data.stage_breakdown}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="model_id" tick={{ fontSize: 11 }} />
+            <XAxis dataKey="stage" tick={{ fontSize: 11 }} />
             <YAxis tick={{ fontSize: 11 }} />
             <Tooltip />
             <Bar dataKey="total_cost_usd" fill="var(--color-chart-1)" name="Cost (USD)" />
-            <Bar dataKey="total_runs" fill="var(--color-chart-2)" name="Runs" />
+            <Bar dataKey="run_count" fill="var(--color-chart-2)" name="Runs" />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
@@ -76,33 +94,38 @@ function QualityChart({ matterId }: { matterId: string }) {
   });
 
   if (isLoading) return <LoadingSpinner />;
-  if (!data?.trends?.length)
+  if (!data?.points?.length)
     return <p className="text-sm text-muted-foreground p-4">No quality data available</p>;
 
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm">Quality Trends</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm">Quality Trends</CardTitle>
+          <span className="text-xs text-muted-foreground">
+            {data.total_runs} runs over {data.days} days
+          </span>
+        </div>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={250}>
-          <LineChart data={data.trends}>
+          <LineChart data={data.points}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-            <YAxis tick={{ fontSize: 11 }} domain={[0, 1]} />
+            <YAxis tick={{ fontSize: 11 }} domain={[0, 100]} />
             <Tooltip />
             <Line
               type="monotone"
-              dataKey="avg_accuracy"
+              dataKey="average_score_percent"
               stroke="var(--color-chart-1)"
-              name="Accuracy"
+              name="Avg Score %"
               strokeWidth={2}
             />
             <Line
               type="monotone"
-              dataKey="avg_f1_score"
-              stroke="var(--color-chart-2)"
-              name="F1 Score"
+              dataKey="critical_failure_rate_percent"
+              stroke="var(--color-destructive)"
+              name="Critical Failure %"
               strokeWidth={2}
             />
           </LineChart>
@@ -119,23 +142,28 @@ function ThroughputChart({ matterId }: { matterId: string }) {
   });
 
   if (isLoading) return <LoadingSpinner />;
-  if (!data?.entries?.length)
+  if (!data?.stage_breakdown?.length)
     return <p className="text-sm text-muted-foreground p-4">No throughput data available</p>;
 
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm">Throughput by Task Type</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm">Throughput by Stage</CardTitle>
+          <span className="text-xs text-muted-foreground">
+            {data.total_runs} runs &middot; avg {data.avg_runtime_seconds.toFixed(1)}s
+          </span>
+        </div>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={250}>
-          <BarChart data={data.entries}>
+          <BarChart data={data.stage_breakdown}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="task_type" tick={{ fontSize: 11 }} />
+            <XAxis dataKey="stage" tick={{ fontSize: 11 }} />
             <YAxis tick={{ fontSize: 11 }} />
             <Tooltip />
-            <Bar dataKey="succeeded" fill="var(--color-chart-2)" name="Succeeded" stackId="a" />
-            <Bar dataKey="failed" fill="var(--color-destructive)" name="Failed" stackId="a" />
+            <Bar dataKey="succeeded_runs" fill="var(--color-chart-2)" name="Succeeded" stackId="a" />
+            <Bar dataKey="failed_runs" fill="var(--color-destructive)" name="Failed" stackId="a" />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>

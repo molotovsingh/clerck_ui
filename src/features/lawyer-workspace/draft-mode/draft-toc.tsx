@@ -93,7 +93,7 @@ export function DraftToc({ matterId, capabilities }: Props) {
             <div className="flex items-center gap-2">
               <StatusBadge status={selectedDraft.status} />
               <span className="text-xs text-muted-foreground">
-                {formatLabel(selectedDraft.doc_type)}
+                {selectedDraft.doc_type ? formatLabel(selectedDraft.doc_type) : "—"}
               </span>
             </div>
             <div className="flex items-center gap-1">

@@ -25,7 +25,7 @@ export interface DraftSectionRegenerate {
 }
 
 export interface DraftSectionRegenerateOut {
-  version: number;
+  version: import("./drafts").DraftVersion;
   ai_run_public_id: string;
   execution_mode: string;
 }

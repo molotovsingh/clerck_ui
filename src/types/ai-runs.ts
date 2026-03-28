@@ -1,8 +1,9 @@
 export interface AiRun {
   id: number;
   run_public_id: string;
-  matter_id: number;
+  matter_id: number | null;
   job_id: number | null;
+  job_type: string;
   actor: string;
   stage: string;
   task_type: string;

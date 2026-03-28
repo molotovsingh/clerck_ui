@@ -16,12 +16,12 @@ import type {
   DraftSectionComment,
   DraftSectionCommentCreate,
 } from "@/types/draft-sections";
-import { DEFAULT_PAGE_LIMIT } from "@/lib/constants";
+import { paginationParams } from "@/lib/constants";
 
 export const draftsApi = {
   list: (matterId: string, params?: { limit?: number; offset?: number }) =>
     api.get<Draft[]>(`/matters/${matterId}/drafts`, {
-      params: { limit: params?.limit ?? DEFAULT_PAGE_LIMIT, offset: params?.offset ?? 0 },
+      params: paginationParams(params),
     }),
 
   create: (matterId: string, data: DraftCreate) =>
@@ -45,7 +45,7 @@ export const draftsApi = {
   ) =>
     api.get<DraftVersion[]>(
       `/matters/${matterId}/drafts/${draftId}/versions`,
-      { params: { limit: params?.limit ?? DEFAULT_PAGE_LIMIT, offset: params?.offset ?? 0 } }
+      { params: paginationParams(params) }
     ),
 
   createVersion: (
@@ -122,7 +122,7 @@ export const draftsApi = {
   ) =>
     api.get<DraftSectionComment[]>(
       `/matters/${matterId}/drafts/${draftId}/sections/${sectionKey}/comments`,
-      { params: { limit: params?.limit ?? DEFAULT_PAGE_LIMIT, offset: params?.offset ?? 0 } }
+      { params: paginationParams(params) }
     ),
 
   createComment: (

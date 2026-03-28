@@ -5,12 +5,12 @@ import type {
   HandoffRequestResolve,
   HandoffActive,
 } from "@/types/handoffs";
-import { DEFAULT_PAGE_LIMIT } from "@/lib/constants";
+import { paginationParams } from "@/lib/constants";
 
 export const handoffsApi = {
   list: (matterId: string, params?: { limit?: number; offset?: number }) =>
     api.get<HandoffRequest[]>(`/matters/${matterId}/handoffs`, {
-      params: { limit: params?.limit ?? DEFAULT_PAGE_LIMIT, offset: params?.offset ?? 0 },
+      params: paginationParams(params),
     }),
 
   getActive: (matterId: string) =>

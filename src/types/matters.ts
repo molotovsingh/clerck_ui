@@ -24,6 +24,13 @@ export interface MatterStatusUpdate {
   approval_date?: string;
 }
 
+export interface LatestValidation {
+  job_id: number;
+  generated_at: string;
+  critical_failures: string[];
+  stale_section_count: number;
+}
+
 export interface MatterReadiness {
   matter_public_id: string;
   matter_status: MatterStatus;
@@ -34,6 +41,7 @@ export interface MatterReadiness {
   approval_name: string | null;
   approval_date: string | null;
   checks: MatterReadinessCheck[];
+  latest_validation: LatestValidation | null;
 }
 
 export interface MatterReadinessCheck {

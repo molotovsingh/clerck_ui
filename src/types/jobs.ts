@@ -5,7 +5,7 @@ export interface Job {
   matter_id: number;
   job_type: JobType;
   status: JobStatus;
-  queued_by: string;
+  queued_by: string | null;
   payload_json: Record<string, unknown> | null;
   result_json: Record<string, unknown> | null;
   error_message: string | null;

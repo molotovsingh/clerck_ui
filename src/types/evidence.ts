@@ -5,15 +5,24 @@ export interface Evidence {
   suffix: string;
   size_bytes: number;
   sha256: string;
-  download_url: string;
+  blob_path: string;
   ingested_at: string;
+}
+
+export interface DuplicateEvidence {
+  id: number;
+  source_relative_path: string;
+  original_name: string;
+  suffix: string;
+  size_bytes: number;
+  sha256: string;
 }
 
 export interface DuplicateCluster {
   sha256: string;
   count: number;
   total_size_bytes: number;
-  evidence: Evidence[];
+  evidence: DuplicateEvidence[];
 }
 
 export interface MatterSearchHit {

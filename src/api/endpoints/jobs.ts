@@ -1,11 +1,11 @@
 import { api } from "../client";
 import type { Job, JobCreate } from "@/types/jobs";
-import { DEFAULT_PAGE_LIMIT } from "@/lib/constants";
+import { paginationParams } from "@/lib/constants";
 
 export const jobsApi = {
   list: (matterId: string, params?: { limit?: number; offset?: number }) =>
     api.get<Job[]>(`/matters/${matterId}/jobs`, {
-      params: { limit: params?.limit ?? DEFAULT_PAGE_LIMIT, offset: params?.offset ?? 0 },
+      params: paginationParams(params),
     }),
 
   get: (jobId: number) => api.get<Job>(`/jobs/${jobId}`),

@@ -3,20 +3,10 @@ import { useRequiredV1Drafts } from "@/hooks/use-drafts";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/common/loading";
-import { CheckCircle2, XCircle, AlertCircle, ArrowRight } from "lucide-react";
+import { CheckCircle2, XCircle, AlertCircle, ArrowRight, Clock, AlertTriangle } from "lucide-react";
 import { formatLabel } from "@/lib/format-label";
-
-// Human-readable labels for check keys
-const CHECK_LABELS: Record<string, string> = {
-  intake_gate: "Case details complete",
-  status_for_client_approval: "Ready for client review",
-  intake_manifest: "Evidence uploaded",
-  claim_source_refs: "Claims linked to evidence",
-  approved_draft: "At least one document approved",
-  required_v1_drafts_approved: "All required documents approved",
-  status_for_court_bundle: "Ready for court filing",
-  approval_metadata: "Client approval recorded",
-};
+import { formatRelative } from "@/lib/format-date";
+import { CHECK_LABELS } from "@/lib/readiness-labels";
 
 export interface ReadinessNavigationTarget {
   leftTab?: string;
@@ -106,6 +96,48 @@ export function ReadinessPanel({ matterId, onNavigate }: ReadinessPanelProps) {
             );
           })}
         </div>
+      </div>
+
+      {/* Validation snapshot (from backend latest_validation) */}
+      <div>
+        <h3 className="text-sm font-semibold mb-2">Validation</h3>
+        {readiness.latest_validation ? (
+          <div className="rounded border p-2 text-sm space-y-1.5">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Clock className="h-3.5 w-3.5 shrink-0" />
+              <span className="text-xs">
+                Last validated {formatRelative(readiness.latest_validation.generated_at)}
+              </span>
+            </div>
+            {readiness.latest_validation.stale_section_count > 0 && (
+              <div className="flex items-center gap-2 text-amber-600">
+                <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                <span className="text-xs">
+                  {readiness.latest_validation.stale_section_count} stale section{readiness.latest_validation.stale_section_count > 1 ? "s" : ""}
+                </span>
+              </div>
+            )}
+            {readiness.latest_validation.critical_failures.length > 0 && (
+              <div className="space-y-1">
+                {readiness.latest_validation.critical_failures.map((f, i) => (
+                  <div key={i} className="flex items-center gap-2 text-destructive">
+                    <XCircle className="h-3.5 w-3.5 shrink-0" />
+                    <span className="text-xs">{f}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {readiness.latest_validation.critical_failures.length === 0 &&
+              readiness.latest_validation.stale_section_count === 0 && (
+              <div className="flex items-center gap-2 text-green-600">
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                <span className="text-xs">All checks passed</span>
+              </div>
+            )}
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground px-2">No validation run yet</p>
+        )}
       </div>
 
       {/* Required V1 Drafts */}

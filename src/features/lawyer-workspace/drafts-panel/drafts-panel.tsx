@@ -11,7 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { LoadingSpinner } from "@/components/common/loading";
 import { EmptyState } from "@/components/common/empty-state";
 import { FormDialog } from "@/components/common/form-dialog";
-import { Plus, FileText, GitCompare } from "lucide-react";
+import { Plus, FileText, GitCompare, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { VersionDiffDialog } from "./version-diff-dialog";
 import { DraftStatusControls } from "./draft-status-controls";
@@ -86,11 +86,17 @@ export function DraftsPanel({
                       v{d.latest_version}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
-                      {formatLabel(d.doc_type)}
+                      {d.doc_type ? formatLabel(d.doc_type) : "—"}
                     </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
+                  {d.has_stale_sections && (
+                    <Badge variant="outline" className="text-xs text-amber-600 border-amber-300 gap-1">
+                      <AlertTriangle className="h-3 w-3" />
+                      {d.stale_section_count} stale
+                    </Badge>
+                  )}
                   <StatusBadge status={d.status} />
                   {d.latest_version > 1 && (
                     <Button

@@ -1,16 +1,16 @@
 import { api } from "../client";
 import type { Evidence, DuplicateCluster, MatterSearchOut } from "@/types/evidence";
-import { DEFAULT_PAGE_LIMIT } from "@/lib/constants";
+import { paginationParams } from "@/lib/constants";
 
 export const evidenceApi = {
   list: (matterId: string, params?: { limit?: number; offset?: number }) =>
     api.get<Evidence[]>(`/matters/${matterId}/evidence`, {
-      params: { limit: params?.limit ?? DEFAULT_PAGE_LIMIT, offset: params?.offset ?? 0 },
+      params: paginationParams(params),
     }),
 
   listDuplicates: (matterId: string, params?: { limit?: number; offset?: number }) =>
     api.get<DuplicateCluster[]>(`/matters/${matterId}/duplicates`, {
-      params: { limit: params?.limit ?? DEFAULT_PAGE_LIMIT, offset: params?.offset ?? 0 },
+      params: paginationParams(params),
     }),
 
   search: (matterId: string, q: string, limit?: number) =>

@@ -5,7 +5,7 @@ import type {
   AiThreadMessage,
   AiThreadMessageCreate,
 } from "@/types/ai-threads";
-import { DEFAULT_PAGE_LIMIT } from "@/lib/constants";
+import { paginationParams } from "@/lib/constants";
 
 export const aiThreadsApi = {
   list: (
@@ -15,8 +15,7 @@ export const aiThreadsApi = {
     api.get<AiThread[]>(`/matters/${matterId}/ai-threads`, {
       params: {
         ...params,
-        limit: params?.limit ?? DEFAULT_PAGE_LIMIT,
-        offset: params?.offset ?? 0,
+        ...paginationParams(params),
       },
     }),
 
@@ -31,7 +30,7 @@ export const aiThreadsApi = {
     params?: { limit?: number; offset?: number }
   ) =>
     api.get<AiThreadMessage[]>(`/ai-threads/${threadId}/messages`, {
-      params: { limit: params?.limit ?? DEFAULT_PAGE_LIMIT, offset: params?.offset ?? 0 },
+      params: paginationParams(params),
     }),
 
   createMessage: (threadId: string, data: AiThreadMessageCreate) =>

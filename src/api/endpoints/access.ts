@@ -1,11 +1,11 @@
 import { api } from "../client";
 import type { MatterAccess, MatterAccessSelf, MatterAccessGrant } from "@/types/access";
-import { DEFAULT_PAGE_LIMIT } from "@/lib/constants";
+import { paginationParams } from "@/lib/constants";
 
 export const accessApi = {
   list: (matterId: string, params?: { limit?: number; offset?: number }) =>
     api.get<MatterAccess[]>(`/matters/${matterId}/access`, {
-      params: { limit: params?.limit ?? DEFAULT_PAGE_LIMIT, offset: params?.offset ?? 0 },
+      params: paginationParams(params),
     }),
 
   getSelf: (matterId: string) =>
