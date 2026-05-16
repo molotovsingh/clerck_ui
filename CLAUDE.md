@@ -2,11 +2,27 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Contract Discipline
+
+`clerck_ui` is the canonical product frontend. The backend repo at `/Users/aksingh/clerck` owns workflow truth and HTTP contracts.
+
+Before changing readiness, filing, export, draft approval, AI chat, job, or permission flows, read:
+
+1. `/Users/aksingh/clerck/docs/FRONTEND_OPERATING_MODEL.md`
+2. `/Users/aksingh/clerck/docs/CONTRACTS.md`
+3. `docs/CONTRACTS_CONSUMER.md`
+4. the relevant backend `FRONTY_*_HANDOFF.md`
+
+Do not duplicate backend policy in React state. Prefer backend booleans, capabilities, stable readiness keys, and `ApiError.detail_code`.
+
+Contract-sensitive work should happen on a branch, not directly on `main`.
+
 ## Build & Dev Commands
 
 ```bash
 npm run dev        # Start dev server on http://localhost:5173
 npm run build      # Type-check (tsc -b) then Vite production build
+npm run ci         # Current pre-review gate; aliases build until tests are added
 npm run preview    # Preview production build locally
 ```
 
