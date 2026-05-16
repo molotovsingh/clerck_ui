@@ -96,7 +96,7 @@ Rules:
 
 Before opening or merging contract-sensitive frontend work:
 
-1. `npm run build` passes.
+1. `npm run ci` passes.
 2. The work uses endpoint wrappers, not component-level `fetch`.
 3. New backend fields have TypeScript types.
 4. Writes invalidate the right query keys.

@@ -22,6 +22,7 @@ Contract-sensitive work should happen on a branch, not directly on `main`.
 ```bash
 npm run dev        # Start dev server on http://localhost:5173
 npm run build      # Type-check (tsc -b) then Vite production build
+npm run ci         # Current pre-review gate; aliases build until tests are added
 npm run preview    # Preview production build locally
 ```
 
